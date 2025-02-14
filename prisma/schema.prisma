@@ -12,11 +12,26 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
-model Product {
+model Products {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   productName String @unique
   price Float 
   categoryId Int
+  img Image[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Category {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName String @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Image {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  productId String @db.ObjectId
+  Products  Products @relation(fields: [productId], references: [id])
+  url String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

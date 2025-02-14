@@ -6,19 +6,23 @@ export async function create(formData: FormData) {
   const productName = formData.get("productName") as string;
   const price = parseFloat(formData.get("price") as string);
   const categoryId = parseInt(formData.get("categoryId") as string, 10);
+  const productsImages = formData.getAll("productsImages").map((image) => ({ url: image as string }));//bug 
   if (!productName.trim()) {
     return;
   }
 
-  await prisma.product.create({
+  await prisma.products.create({
     data: {
       productName: productName,
       price: price,
       categoryId: categoryId,
+      img: {
+        create: productsImages,
+      },
     },
   });
 
-  revalidatePath("/");``
+  revalidatePath("/");
 }
 
 // export async function edit(formData: FormData) {
