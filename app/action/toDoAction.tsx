@@ -2,81 +2,78 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/utils/prisma";
 
-export async function create(formData: FormData) {
+export async function createProduct(
+  formData: FormData,
+  productsImages: string[]
+) {
   const productName = formData.get("productName") as string;
   const price = parseFloat(formData.get("price") as string);
   const categoryId = parseInt(formData.get("categoryId") as string, 10);
-  const productsImages = formData.getAll("productsImages").map((image) => ({ url: image as string }));//bug 
+  console.log(productsImages);
   if (!productName.trim()) {
     return;
   }
-
-  await prisma.products.create({
+  const product = await prisma.products.create({
     data: {
       productName: productName,
       price: price,
       categoryId: categoryId,
       img: {
-        create: productsImages,
+        create: productsImages.map((url) => ({
+          url,
+        })),
       },
     },
   });
-
   revalidatePath("/");
 }
-
-// export async function edit(formData: FormData) {
-//   const input = formData.get("newTitle") as string;
-//   const inputId = formData.get("inputId") as string;
-
-//   await prisma.todo.update({
-//     where: {
-//       id: inputId,
-//     },
-//     data: {
-//       title: input,
-//     },
-//   });
-
-//   revalidatePath("/");
-// }
-
-// export async function deleteTodo(formData: FormData) {
-//   const inputId = formData.get("inputId") as string;
-
-//   await prisma.todo.delete({
-//     where: {
-//       id: inputId,
-//     },
-//   });
-
-//   revalidatePath("/");
-// }
-
-// export async function todoStatus(formData: FormData) {
-//   const inputId = formData.get("inputId") as string;
-//   const todo = await prisma.todo.findUnique({
-//     where: {
-//       id: inputId,
-//     },
-//   });
-
-//   if (!todo) {
-//     return;
-//   }
-
-//   const updatedStatus = !todo.isCompleted;
-
-//   await prisma.todo.update({
-//     where: {
-//       id: inputId,
-//     },
-//     data: {
-//       isCompleted: updatedStatus,
-//     },
-//   });
-
-//   revalidatePath("/");
-
-//   return updatedStatus;
-// }
+export async function deleteProduct(formData: FormData) {
+  try {
+    const productName = formData.get("productName") as string;
+    if (!productName.trim()) {
+      return;
+    }
+    await prisma.image.deleteMany({
+      where: {
+        Products: {
+          productName: productName,
+        },
+      },
+    });
+    await prisma.products.delete({
+      where: {
+        productName: productName,
+      },
+    });
+    revalidatePath("/");
+    return { success: true, message: "Product deleted successfully" };
+  } catch (error) {
+    return { success: false, message: "Failed to delete product" };
+  }
+}
+export async function updateProduct(
+  formData: FormData,
+  productsImages: string[]
+) {
+  const productName = formData.get("productName") as string;
+  const price = parseFloat(formData.get("price") as string);
+  const categoryId = parseInt(formData.get("categoryId") as string, 10);
+  if (!productName.trim()) {
+    return;
+  }
+  await prisma.products.update({
+    where: {
+      productName: productName,
+    },
+    data: {
+      productName: productName,
+      price: price,
+      categoryId: categoryId,
+      img: {
+        create: productsImages.map((url) => ({
+          url,
+        })),
+      },
+    },
+  });
+}

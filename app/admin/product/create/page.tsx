@@ -1,75 +1,121 @@
 "use client";
-import { create } from "@/app/action/toDoAction";
-import Button from "@/components/own/Button";
-import Form from "@/components/own/Form";
-// import Input from "@/components/own/Input";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import * as z from "zod";
+import { formSchema } from "./form-schema";
+import { serverAction } from "./server-action";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  FormDescription,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Image from "next/image";
 
-const page = () => {
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [imageURL, setImageURL] = useState<string[]>([]);
-  useEffect(() => {
-    console.log(imageURL);
-  }, [imageURL]);
-  return (
-    <>
-      <Form action={create} className="w-1/2 m-auto">
-        <div className="flex flex-col gap-4">
-          <Input name="productName" type="text" placeholder="Add Todo..." />
-          <Input name="price" type="number" placeholder="Add Todo..." />
-          <Input name="categoryId" type="number" placeholder="Add Todo..." />
-          <div className="pt-10 flex flex-col">
-            <div className="flex flex-wrap gap-1 p-5 bg-zinc-200  w-[650px] min-h-[300px] mx-auto mt-6 mb-10 rounded-md shadow-sm">
-              {imageURL.map((url) => (
-                <div
-                  className="relative flex-1 basis-[300px] h-[200px]"
-                  key={url}
-                >
-                  <Image src={url} alt="Picture of the author" fill />
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <div className="grid w-full max-w-sm items-center gap-1.5">
-                <Label htmlFor="picture">Picture</Label>
-                <Input
-                  id="picture"
-                  type="file"
-                  name="productsImages"
-                  ref={fileInputRef}
-                  disabled={isUploading}
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0] as File;
-                    setIsUploading(true);
-                    const data = new FormData();
-                    data.set("file", file);
-                    const response = await fetch("/api/uploadFiles", {
-                      method: "POST",
-                      body: data,
-                    });
-                    const signURL = await response.json();
-                    setImageURL((prev) => [...prev, signURL]);
-                    setIsUploading(false);
-                  }}
-                />
-              </div>
-              {/* <button
-                className="bg-blue-500 px-4 py-2 Itext-white rounded-sm self-center font-semibold"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                {isUploading ? "Uploading..." : "Upload imgae"}
-              </button> */}
-            </div>
-          </div>
-          <Button type="submit" text="Add" />
-        </div>
-      </Form>
-    </>
-  );
+const initialState = {
+  success: false,
+  message: "",
 };
 
+const page = () => {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {},
+  });
+
+  const [state, action, isPending] = React.useActionState(
+    serverAction,
+    initialState
+  );
+  return (
+    <div>
+      <Form {...form}>
+        <form
+          action={action}
+          className="flex flex-col p-2 md:p-5 w-full mx-auto rounded-md max-w-3xl gap-2 border"
+        >
+          <h2 className="text-2xl font-bold">Create product</h2>
+          <p className="text-base">Please fill the form below to contact us</p>
+
+          <div className="flex items-center justify-between flex-wrap sm:flex-nowrap w-full gap-2">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Name</FormLabel> *
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your name"
+                      type={"text"}
+                      value={field.value}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(val);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="price"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Price</FormLabel> *
+                  <FormControl>
+                    <Input
+                      placeholder="Enter product price"
+                      type={"number"}
+                      value={field.value}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        field.onChange(+val);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormLabel>Category</FormLabel> *
+                <FormControl>
+                  <Input
+                    placeholder="Enter your text"
+                    type={"number"}
+                    value={field.value}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      field.onChange(+val);
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex justify-end items-center w-full pt-3">
+            
+            <Button className="rounded-lg" size="sm">
+              {isPending ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
 export default page;

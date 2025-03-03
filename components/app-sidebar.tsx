@@ -58,16 +58,16 @@ const data = {
       isActive: true,
       items: [
         {
-          title: "Add product",
-          url: "/admin/product/create",
+          title: "Product",
+          url: "/admin/product",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Delete",
+          url: "/admin/product/delete",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Edit",
+          url: "/admin/product/edit",
         },
       ],
     },
