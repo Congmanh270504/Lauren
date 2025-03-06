@@ -9,11 +9,8 @@ export interface ActionResponse<T = any> {
   inputs?: T;
 }
 export const formSchema = z.object({
-  name: z.string(),
+  productName: z.string(),
   price: z.number(),
-  category: z.number(),
-  "MultiSelect-5": z
-    .array(z.string())
-    .nonempty("Please at least one item")
-    .optional(),
+  categoryId: z.number(),
+  productsImages: z.array(z.string()),
 });

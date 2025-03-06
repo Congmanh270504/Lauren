@@ -1,7 +1,6 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/utils/prisma";
-
 export async function createProduct(
   formData: FormData,
   productsImages: string[]
@@ -9,23 +8,29 @@ export async function createProduct(
   const productName = formData.get("productName") as string;
   const price = parseFloat(formData.get("price") as string);
   const categoryId = parseInt(formData.get("categoryId") as string, 10);
-  console.log(productsImages);
+  console.log(productName, price, categoryId);
   if (!productName.trim()) {
-    return;
+    return { ok: false, message: "Product name is required" };
   }
-  const product = await prisma.products.create({
-    data: {
-      productName: productName,
-      price: price,
-      categoryId: categoryId,
-      img: {
-        create: productsImages.map((url) => ({
-          url,
-        })),
+  try {
+    const product = await prisma.products.create({
+      data: {
+        productName: productName,
+        price: price,
+        categoryId: categoryId,
+        img: {
+          create: productsImages.map((url) => ({
+            url,
+          })),
+        },
       },
-    },
-  });
-  revalidatePath("/");
+    });
+    revalidatePath("/");
+    return { ok: true, message: "Product created successfully" };
+  } catch (error) {
+    console.error("Error creating product:", error);
+    return { ok: false, message: "Failed to create product" };
+  }
 }
 export async function deleteProduct(formData: FormData) {
   try {
