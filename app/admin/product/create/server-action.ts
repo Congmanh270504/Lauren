@@ -1,5 +1,5 @@
 "use server";
-import { ActionResponse, formSchema } from "./form-schema";
+import { ActionResponse, formSchema } from "../form-schema";
 
 export const serverAction = async (
   prevState: ActionResponse | null,

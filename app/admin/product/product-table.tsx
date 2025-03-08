@@ -56,7 +56,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ product }) => {
               <TableCell>
                 <DeleteDialog product={prod} />
               </TableCell>
-              <TableCell>Edit</TableCell>
+              <TableCell>
+                <Button>
+                  <Link href={`/admin/product/edit/${prod.id}`}>Update</Link>
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

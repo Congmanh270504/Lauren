@@ -1,8 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import * as z from "zod";
-import { formSchema } from "../form-schema";
-import { serverAction } from "./server-action";
+import { formSchema } from "../../form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -20,16 +19,16 @@ import UploadFile from "@/components/own/upload-file";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/app/action/toDoAction";
-const page = () => {
+import { productType } from "@/types/productType";
+
+const EditForm = ({ product }: { product: productType }) => {
+  const [imageURL, setImageURL] = useState<string[]>(
+    product.img ? product.img.map((img) => img.url) : []
+  );
   const [isUploading, setIsUploading] = useState(false);
-  const [imageURL, setImageURL] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  const initialState = {
-    success: false,
-    message: "",
-  };
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,10 +38,6 @@ const page = () => {
       productsImages: [],
     },
   });
-  const [state, action, isPending] = React.useActionState(
-    serverAction,
-    initialState
-  );
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -79,20 +74,19 @@ const page = () => {
       }
     } catch (error) {
       toast.error("Đã xảy ra lỗi khi thêm sản phẩm. Vui lòng thử lại.");
+    } finally {
+      router.push("/");
     }
-    // finally {
-    //   router.push("/");
-    // }
   };
 
   return (
-    <div className="mt-22">
+    <div className="mt-2">
       <Form {...form}>
         <form
           onSubmit={handleSubmit}
           className="flex flex-col p-2 md:p-5 w-full mx-auto rounded-md max-w-3xl gap-2 border"
         >
-          <h2 className="text-2xl font-bold">Create product</h2>
+          <h2 className="text-2xl font-bold">Eidt product</h2>
           <p className="text-base">Please fill the form below to contact us</p>
 
           <div className="flex items-center justify-between flex-wrap sm:flex-nowrap w-full gap-2">
@@ -107,7 +101,7 @@ const page = () => {
                       placeholder="Enter your name"
                       name="productName"
                       type={"text"}
-                      value={field.value}
+                      value={product.productName}
                       onChange={(e) => {
                         const val = e.target.value;
                         field.onChange(val);
@@ -129,7 +123,7 @@ const page = () => {
                       placeholder="Enter product price"
                       type={"number"}
                       name="price"
-                      value={field.value}
+                      value={product.price}
                       onChange={(e) => {
                         const val = e.target.value;
                         field.onChange(+val);
@@ -152,7 +146,7 @@ const page = () => {
                     placeholder="Enter your text"
                     type={"number"}
                     name="categoryId"
-                    value={field.value}
+                    value={product.categoryId}
                     onChange={(e) => {
                       const val = e.target.value;
                       field.onChange(+val);
@@ -185,8 +179,12 @@ const page = () => {
               Cancel
             </Button>
 
-            <Button className="rounded-lg" size="sm">
-              {isPending ? "Submitting..." : "Submit"}
+            <Button
+              className="rounded-lg"
+              size="sm"
+              onClick={() => setIsSubmitting(true)}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
             </Button>
           </div>
         </form>
@@ -195,4 +193,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default EditForm;

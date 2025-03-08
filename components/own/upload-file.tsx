@@ -1,20 +1,27 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { setRequestMeta } from "next/dist/server/request-meta";
 
 interface UploadFileProps {
   imageURL: string[];
+  setImageURL: React.Dispatch<React.SetStateAction<string[]>>;
   handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const UploadFile: React.FC<UploadFileProps> = ({
   imageURL,
   handleFileChange,
+  setImageURL,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const handleClosed = (url: string) => {
+    setImageURL((prev) => prev.filter((item) => item !== url));
+  };
   return (
     <div className="flex items-center justify-center w-full">
       <Label
@@ -34,6 +41,13 @@ const UploadFile: React.FC<UploadFileProps> = ({
                   fill
                   className="object-cover"
                 />
+                <Button
+                  variant="outline"
+                  className="absolute top-1 right-1 border-none rounded-full bg-[#EAEAEA] text-[#443627] px-3 py-22"
+                  onClick={() => handleClosed(url)}
+                >
+                  X
+                </Button>
               </div>
             ))}
           </div>

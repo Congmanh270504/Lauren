@@ -21,7 +21,6 @@ import { Toaster, toast } from "sonner";
 export default function DeleteDialog({ product }: { product: productType }) {
   const handleDeleteProduct = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
-      console.log("ssssss");
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
       try {
