@@ -26,8 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden scrollbar-hide`}
       >
+        {/* <h className="overflow-y-hidden"></h> */}
         {children}
         <Toaster richColors position="bottom-right" />;
       </body>

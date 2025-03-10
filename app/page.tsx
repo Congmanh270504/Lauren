@@ -70,20 +70,10 @@ export default function Page() {
               />
             </div>
           </div>
-          {/* <div className="min-h-[300px] md:min-h-[400px] relative rounded-xl bg-muted/50 overflow-hidden">
-          <Image
-              src="/4.jpg"
-              fill
-              quality={100}
-              alt="Cosmic nebula scene"
-              className="object-cover rounded-xl"
-              sizes="(max-width: 768px) 100vw, 100vw"
-            /> 
-          </div> */}
           <div className="min-h-[50vh] flex-1 rounded-xl bg-muted/50 md:min-h-min relative">
             {" "}
             <Image
-              src="/3.jpg"
+              src="/4.jpg"
               fill
               alt="Picture of the author"
               className="w-full h-full object-cover rounded-xl"

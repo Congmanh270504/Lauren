@@ -13,25 +13,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 model Products {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  productName String @unique
-  price Float 
-  categoryId Int
-  img Image[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productName String   @unique
+  price       Float
+  categoryId  String   @db.ObjectId
+  Category    Category @relation(fields: [categoryId], references: [id])
+  img         Image[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
+
 model Category {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  categoryName String @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  categoryName String     @unique
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  Products     Products[]
 }
+
 model Image {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId  String   @db.ObjectId
+  Products   Products @relation(fields: [productId], references: [id])
+  url        String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+model User {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
-  productId String @db.ObjectId
-  Products  Products @relation(fields: [productId], references: [id])
-  url String
+  email String @unique
+  password String
+  role String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

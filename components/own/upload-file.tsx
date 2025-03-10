@@ -1,39 +1,77 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { setRequestMeta } from "next/dist/server/request-meta";
+import { toast } from "sonner";
 
 interface UploadFileProps {
   imageURL: string[];
   setImageURL: React.Dispatch<React.SetStateAction<string[]>>;
-  handleFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const UploadFile: React.FC<UploadFileProps> = ({
   imageURL,
-  handleFileChange,
   setImageURL,
 }) => {
+  const prevImageURLRef = useRef<string[]>(imageURL);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      try {
+        const uploadedURLs = await Promise.all(
+          Array.from(files).map(async (file) => {
+            const data = new FormData();
+            data.set("file", file);
+            const response = await fetch("/api/uploadFiles", {
+              method: "POST",
+              body: data,
+            });
+            if (!response.ok) {
+              throw new Error("Failed to upload file");
+            }
+            const signURL = await response.json();
+            return signURL;
+          })
+        );
+        if (imageURL.find((item) => uploadedURLs.includes(item))) {
+          toast.error("Already uploaded");
+        } else {
+          setImageURL((prev) => {
+            const newURLs = [...prev, ...uploadedURLs];
+            return Array.from(new Set(newURLs)); // Ensure unique URLs
+          });
+        }
+      } catch (error) {
+        console.error("Error uploading files:", error);
+        toast.error("Failed to upload files. Please try again.");
+      }
+    }
+  };
+
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const handleClosed = (url: string) => {
-    setImageURL((prev) => prev.filter((item) => item !== url));
+    setImageURL((prev) => {
+      const newURLs = prev.filter((item) => item !== url);
+      return newURLs;
+    });
   };
+ 
   return (
     <div className="flex items-center justify-center w-full">
       <Label
         htmlFor="productsImages"
-        className="flex items-center justify-center w-full min-h-64 h-full  border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+        className="flex items-center justify-center w-full min-h-64 h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
         {imageURL.length > 0 ? (
           <div className="grid grid-cols-3 gap-2 p-2">
-            {imageURL.map((url) => (
+            {imageURL.map((url, i) => (
               <div
                 className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
-                key={url}
+                key={i}
               >
                 <Image
                   src={url || "/placeholder.svg"}

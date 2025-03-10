@@ -1,14 +1,18 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/utils/prisma";
+import { object } from "zod";
+import { ObjectId } from "mongodb";
 export async function createProduct(
   formData: FormData,
   productsImages: string[]
 ) {
   const productName = formData.get("productName") as string;
   const price = parseFloat(formData.get("price") as string);
-  const categoryId = parseInt(formData.get("categoryId") as string, 10);
+  const categoryId = formData.get("categoryId") as string;
   console.log(productName, price, categoryId);
+  console.log(productsImages);
+  console.log(formData);
   if (!productName.trim()) {
     return { ok: false, message: "Product name is required" };
   }
@@ -17,7 +21,7 @@ export async function createProduct(
       data: {
         productName: productName,
         price: price,
-        categoryId: categoryId,
+        categoryId: new ObjectId(categoryId).toString(),
         img: {
           create: productsImages.map((url) => ({
             url,
@@ -58,27 +62,41 @@ export async function deleteProduct(formData: FormData) {
 }
 export async function updateProduct(
   formData: FormData,
-  productsImages: string[]
+  productsImages: string[] = [],
+  id: string
 ) {
   const productName = formData.get("productName") as string;
   const price = parseFloat(formData.get("price") as string);
-  const categoryId = parseInt(formData.get("categoryId") as string, 10);
+  const categoryId = formData.get("categoryId") as string;
+  console.log(productName, price, categoryId);
+
   if (!productName.trim()) {
-    return;
+    return { ok: false, message: "Product name is required" };
   }
-  await prisma.products.update({
-    where: {
-      productName: productName,
-    },
-    data: {
-      productName: productName,
-      price: price,
-      categoryId: categoryId,
-      img: {
-        create: productsImages.map((url) => ({
-          url,
-        })),
+  try {
+    await prisma.image.deleteMany({
+      where: {
+        productId: new ObjectId(id).toString(),
       },
-    },
-  });
+    });
+
+    await prisma.products.update({
+      where: {
+        id: new ObjectId(id).toString(),
+      },
+      data: {
+        productName: productName,
+        price: price,
+        categoryId: categoryId,
+        img: {
+          create: productsImages.map((url) => ({
+            url,
+          })),
+        },
+      },
+    });
+    return { ok: true, message: "Product updated successfully" };
+  } catch (error) {
+    return { ok: false, message: "Failed to update product" };
+  }
 }

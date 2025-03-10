@@ -20,10 +20,9 @@ import UploadFile from "@/components/own/upload-file";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/app/action/toDoAction";
+
 const page = () => {
-  const [isUploading, setIsUploading] = useState(false);
   const [imageURL, setImageURL] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const initialState = {
@@ -35,7 +34,7 @@ const page = () => {
     defaultValues: {
       productName: "",
       price: 0,
-      categoryId: 0,
+      categoryId: "",
       productsImages: [],
     },
   });
@@ -43,27 +42,6 @@ const page = () => {
     serverAction,
     initialState
   );
-
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      setIsUploading(true);
-      const uploadedURLs = await Promise.all(
-        Array.from(files).map(async (file) => {
-          const data = new FormData();
-          data.set("file", file);
-          const response = await fetch("/api/uploadFiles", {
-            method: "POST",
-            body: data,
-          });
-          const signURL = await response.json();
-          return signURL;
-        })
-      );
-      setImageURL((prev) => [...prev, ...uploadedURLs]);
-      setIsUploading(false);
-    }
-  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     try {
@@ -150,12 +128,12 @@ const page = () => {
                 <FormControl>
                   <Input
                     placeholder="Enter your text"
-                    type={"number"}
+                    type={"text"}
                     name="categoryId"
                     value={field.value}
                     onChange={(e) => {
                       const val = e.target.value;
-                      field.onChange(+val);
+                      field.onChange(val);
                     }}
                   />
                 </FormControl>
@@ -172,7 +150,6 @@ const page = () => {
                 <FormControl>
                   <UploadFile
                     imageURL={imageURL}
-                    handleFileChange={handleFileChange}
                     setImageURL={setImageURL}
                   />
                 </FormControl>
@@ -185,7 +162,7 @@ const page = () => {
               Cancel
             </Button>
 
-            <Button className="rounded-lg" size="sm">
+            <Button className="rounded-lg" size="sm" type="submit">
               {isPending ? "Submitting..." : "Submit"}
             </Button>
           </div>
