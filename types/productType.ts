@@ -10,3 +10,9 @@ export type productType = {
     url: string;
   }[];
 };
+export type categoryType = {
+  id: string;
+  categoryName: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};

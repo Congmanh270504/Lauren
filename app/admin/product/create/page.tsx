@@ -43,11 +43,9 @@ const page = () => {
     initialState
   );
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      const response = await createProduct(formData, imageURL);
+      const response = await createProduct(data, imageURL);
       if (response.ok) {
         toast.success("Thêm sản phẩm thành công.");
         router.push("/");
@@ -58,16 +56,13 @@ const page = () => {
     } catch (error) {
       toast.error("Đã xảy ra lỗi khi thêm sản phẩm. Vui lòng thử lại.");
     }
-    // finally {
-    //   router.push("/");
-    // }
   };
 
   return (
     <div className="mt-22">
       <Form {...form}>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="flex flex-col p-2 md:p-5 w-full mx-auto rounded-md max-w-3xl gap-2 border"
         >
           <h2 className="text-2xl font-bold">Create product</h2>
@@ -151,6 +146,7 @@ const page = () => {
                   <UploadFile
                     imageURL={imageURL}
                     setImageURL={setImageURL}
+                    field={field} // Pass the field object to the UploadFile component
                   />
                 </FormControl>
                 <FormMessage />

@@ -10,11 +10,13 @@ import { toast } from "sonner";
 interface UploadFileProps {
   imageURL: string[];
   setImageURL: React.Dispatch<React.SetStateAction<string[]>>;
+  field: any; // Add this line to accept the field object from react-hook-form
 }
 
 const UploadFile: React.FC<UploadFileProps> = ({
   imageURL,
   setImageURL,
+  field, // Add this line to accept the field object from react-hook-form
 }) => {
   const prevImageURLRef = useRef<string[]>(imageURL);
 
@@ -59,7 +61,15 @@ const UploadFile: React.FC<UploadFileProps> = ({
       return newURLs;
     });
   };
- 
+
+  // Update the form field when imageURL changes
+  useEffect(() => {
+    if (prevImageURLRef.current !== imageURL) {
+      field.onChange(imageURL);
+      prevImageURLRef.current = imageURL;
+    }
+  }, [imageURL, field]);
+
   return (
     <div className="flex items-center justify-center w-full">
       <Label

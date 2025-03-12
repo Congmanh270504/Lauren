@@ -3,16 +3,14 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/utils/prisma";
 import { object } from "zod";
 import { ObjectId } from "mongodb";
-export async function createProduct(
-  formData: FormData,
-  productsImages: string[]
-) {
-  const productName = formData.get("productName") as string;
-  const price = parseFloat(formData.get("price") as string);
-  const categoryId = formData.get("categoryId") as string;
+interface Data {
+  productName: string;
+  price: number;
+  categoryId: string;
+}
+export async function createProduct(data: Data, productsImages: string[]) {
+  const { productName, price, categoryId } = data;
   console.log(productName, price, categoryId);
-  console.log(productsImages);
-  console.log(formData);
   if (!productName.trim()) {
     return { ok: false, message: "Product name is required" };
   }
@@ -21,7 +19,7 @@ export async function createProduct(
       data: {
         productName: productName,
         price: price,
-        categoryId: new ObjectId(categoryId).toString(),
+        categoryId: categoryId,
         img: {
           create: productsImages.map((url) => ({
             url,
