@@ -14,19 +14,21 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { productType } from "@/types/productType";
-import { deleteProduct } from "@/app/action/toDoAction";
+import { categoryType } from "@/types/productType";
+import { deleteCategory } from "@/app/action/category";
 import { Toaster, toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-export default function DeleteDialog({ product }: { product: productType }) {
+export default function DeleteDialog({ category }: { category: categoryType }) {
+  const router = useRouter();
   const handleDeleteProduct = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      const formData = new FormData(event.currentTarget);
       try {
-        const response = await deleteProduct(formData);
-        if (response && response.success) {
-          toast.success("Delete product has been successfully");
+        const response = await deleteCategory(category.id);
+        if (response.ok) {
+          toast.success(response.message);
+          router.push("/");
         } else {
           toast.error("Delete product has not been failed");
         }
@@ -39,13 +41,13 @@ export default function DeleteDialog({ product }: { product: productType }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Delete Product</Button>
+        <Button variant="destructive">Delete Category</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Delete Product</DialogTitle>
+          <DialogTitle>Delete Category</DialogTitle>
           <DialogDescription>
-            Make sure you want to delete product here. Click save when you're
+            Make sure you want to delete category here. Click save when you're
             done.
           </DialogDescription>
         </DialogHeader>
@@ -53,50 +55,17 @@ export default function DeleteDialog({ product }: { product: productType }) {
           <Form onSubmit={handleDeleteProduct}>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="productName" className="text-right">
-                Product Name
+                Category Name
               </Label>
               <Input
                 id="productName"
                 name="productName"
-                defaultValue={product.productName}
+                defaultValue={category.categoryName}
                 className="col-span-3"
                 readOnly
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                CategoryId
-              </Label>
-              <Input
-                id="categoryId"
-                defaultValue={product.categoryId.toString()}
-                className="col-span-3"
-                readOnly
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Price
-              </Label>
-              <Input
-                id="price"
-                defaultValue={product.price.toString()}
-                className="col-span-3"
-                readOnly
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="username" className="text-right">
-                Price
-              </Label>
-              <Input
-                id="price"
-                defaultValue={product.price.toString()}
-                className="col-span-3"
-                readOnly
-              />
-            </div>
-            <DialogFooter>
+            <DialogFooter className="mt-3 gap-2">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
                   Cancel

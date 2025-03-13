@@ -40,14 +40,14 @@ const page = () => {
     try {
       const response = await createCategory(data);
       if (response.ok) {
-        toast.success("Thêm sản phẩm thành công.");
+        toast.success(response.message);
         router.push("/");
         router.refresh();
       } else {
-        toast.error("Đã xảy ra lỗi. Vui lòng thử lại");
+        toast.error(response.message);
       }
     } catch (error) {
-      toast.error("Đã xảy ra lỗi khi thêm sản phẩm. Vui lòng thử lại.");
+      toast.error("Failed to create category");
     }
   };
   return (

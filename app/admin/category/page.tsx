@@ -12,7 +12,7 @@ const page = async () => {
   const category = await getData();
   return (
     <div>
-      <h1>Product</h1>
+      <h1>Category</h1>
       <CategoryTable category={category} />
     </div>
   );
