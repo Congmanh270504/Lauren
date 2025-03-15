@@ -12,6 +12,8 @@ import Link from "next/link";
 import DeleteDialog from "./delete/page";
 import { categoryType } from "@/types/productType";
 import { EditDeleteDialog } from "@/components/editDelete-dialog";
+import { useDispatch, useSelector } from "react-redux";
+import { handleClickOutside } from "@/app/state/modify/modifyItem";
 
 interface CategoryTableProps {
   category: categoryType[];
@@ -20,9 +22,13 @@ interface CategoryTableProps {
 const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  const handleClickOutside = () => {};
+  // Use the useSelector hook to get the activeDropdown state from the store
+  const dispatch = useDispatch();
   return (
-    <div className="w-full bg-gray-50 p-4" onClick={handleClickOutside}>
+    <div
+      className="w-full bg-gray-50 p-4"
+      onClick={() => dispatch(handleClickOutside())}
+    >
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -82,7 +88,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
                       : "N/A"}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                    <EditDeleteDialog id={cat.id} handleClickOutside ={handleClickOutside}/>
+                    <EditDeleteDialog id={cat.id} />
                     {/* <MoreVertical className="h-5 w-5" /> */}
                   </td>
                 </tr>

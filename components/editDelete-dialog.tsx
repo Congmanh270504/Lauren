@@ -15,30 +15,25 @@ import { Label } from "@/components/ui/label";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { MdEditDocument } from "react-icons/md";
 import { MoreVertical } from "lucide-react";
+import { toggleDropdown } from "@/app/state/modify/modifyItem";
+import { RootState } from "@/app/state/store"; // Import RootState
+import { useDispatch, useSelector } from "react-redux";
+
 interface EditDeleteDialogProps {
   id: string;
 }
-export function EditDeleteDialog(
-  { id }: EditDeleteDialogProps,
-  handleClickOutside: () => void
-) {
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-
-  handleClickOutside = () => {
-    if (activeDropdown !== null) {
-      setActiveDropdown(null);
-    }
-  };
-  const toggleDropdown = (id: string) => {
-    setActiveDropdown(activeDropdown === id ? null : id);
-  };
+export function EditDeleteDialog({ id }: EditDeleteDialogProps) {
+  const activeDropdown = useSelector(
+    (state: RootState) => state.modifyItem.activeDropdown
+  );
+  const dispatch = useDispatch();
   return (
     <>
       <button
         className="text-gray-400 hover:text-gray-500"
         onClick={(e) => {
           e.stopPropagation();
-          toggleDropdown(id);
+          dispatch(toggleDropdown(id));
         }}
       >
         <MoreVertical className="h-5 w-5" />
