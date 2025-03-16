@@ -11,7 +11,7 @@ async function getData() {
 const page = async () => {
   const category = await getData();
   return (
-    <div>
+    <div className="w-full bg-gray-50">
       <h1>Category</h1>
       <CategoryTable category={category} />
     </div>

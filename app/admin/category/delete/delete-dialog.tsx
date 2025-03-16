@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import Form from "@/components/own/Form";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,58 +14,81 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { categoryType } from "@/types/productType";
 import { deleteCategory } from "@/app/action/category";
 import { Toaster, toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { fetchCategory } from "@/app/state/category/category";
+import { RootState, AppDispatch } from "@/app/state/store";
+import { useDispatch, useSelector } from "react-redux";
+import { FaRegTrashAlt } from "react-icons/fa";
 
-export default function DeleteDialog({ category }: { category: categoryType }) {
-  const router = useRouter();
-  const handleDeleteProduct = useCallback(
+interface DeleteDialogProps {
+  id: string;
+}
+
+export default function DeleteDialog({ id }: DeleteDialogProps) {
+  const dispatch: AppDispatch = useDispatch();
+
+  const category = useSelector((state: RootState) => state.category);
+  
+  useEffect(() => {
+    dispatch(fetchCategory());
+    console.log("Category state:", category); // Log the category state
+  }, [dispatch]);
+  
+  const cat = category.find((cat) => cat.id === id);
+  const handleDeletecategory = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       try {
-        const response = await deleteCategory(category.id);
-        if (response.ok) {
-          toast.success(response.message);
-          router.push("/");
+        const response = await deleteCategory(id);
+        if (response && response.ok) {
+          toast.success("Delete category has been successfully");
+          dispatch(fetchCategory()); // Refresh the category list after deletion
         } else {
-          toast.error("Delete product has not been failed");
+          toast.error("Delete category has not been failed");
         }
       } catch (error) {
         toast.error("Event has not been created");
       }
     },
-    []
+    [dispatch, id]
   );
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="destructive">Delete Category</Button>
+        <button
+          className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 hover:text-red-700 w-full text-left text-md justify-around"
+          role="menuitem"
+        >
+          Delete
+          <FaRegTrashAlt />
+        </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Delete Category</DialogTitle>
+          <DialogTitle>Delete category</DialogTitle>
           <DialogDescription>
             Make sure you want to delete category here. Click save when you're
             done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <Form onSubmit={handleDeleteProduct}>
+          <Form onSubmit={handleDeletecategory}>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="productName" className="text-right">
-                Category Name
+              <Label htmlFor="categoryName" className="text-right">
+                category Name
               </Label>
               <Input
-                id="productName"
-                name="productName"
-                defaultValue={category.categoryName}
+                id="categoryName"
+                name="categoryName"
+                defaultValue={cat ? cat.categoryName : ""}
                 className="col-span-3"
                 readOnly
               />
             </div>
-            <DialogFooter className="mt-3 gap-2">
+
+            <DialogFooter>
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
                   Cancel

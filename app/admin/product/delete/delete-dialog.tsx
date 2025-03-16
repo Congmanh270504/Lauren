@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { productType } from "@/types/productType";
-import { deleteProduct } from "@/app/action/toDoAction";
+import { productType } from "@/types/itemTypes";
+import { deleteProduct } from "@/app/action/products";
 import { Toaster, toast } from "sonner";
 
 export default function DeleteDialog({ product }: { product: productType }) {
@@ -25,7 +25,7 @@ export default function DeleteDialog({ product }: { product: productType }) {
       const formData = new FormData(event.currentTarget);
       try {
         const response = await deleteProduct(formData);
-        if (response && response.success) {
+        if (response && response.ok) {
           toast.success("Delete product has been successfully");
         } else {
           toast.error("Delete product has not been failed");

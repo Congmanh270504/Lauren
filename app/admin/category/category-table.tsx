@@ -9,12 +9,12 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import DeleteDialog from "./delete/page";
-import { categoryType } from "@/types/productType";
+import DeleteDialog from "./delete/delete-dialog";
+import { categoryType } from "@/types/itemTypes";
 import { EditDeleteDialog } from "@/components/editDelete-dialog";
 import { useDispatch, useSelector } from "react-redux";
 import { handleClickOutside } from "@/app/state/modify/modifyItem";
-
+import { FaPlus } from "react-icons/fa6";
 interface CategoryTableProps {
   category: categoryType[];
 }
@@ -22,13 +22,9 @@ interface CategoryTableProps {
 const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
-  // Use the useSelector hook to get the activeDropdown state from the store
   const dispatch = useDispatch();
   return (
-    <div
-      className="w-full bg-gray-50 p-4"
-      onClick={() => dispatch(handleClickOutside())}
-    >
+    <div className="w-full p-4" onClick={() => dispatch(handleClickOutside())}>
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -88,7 +84,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
                       : "N/A"}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                    <EditDeleteDialog id={cat.id} />
+                    <EditDeleteDialog id={cat.id.toString()} />
                     {/* <MoreVertical className="h-5 w-5" /> */}
                   </td>
                 </tr>
@@ -137,22 +133,14 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
 
       {/* Help button */}
       <div className="fixed bottom-6 right-6">
-        <button className="bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
-          </svg>
-        </button>
+        <Link href={`/admin/category/create`}>
+          <button className="relative bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg group">
+            <span className="absolute left-[-125px] top-1/2 transform -translate-y-1/2 bg-gray-500 text-white text-sm rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              Create Category
+            </span>
+            <FaPlus />
+          </button>
+        </Link>
       </div>
     </div>
   );

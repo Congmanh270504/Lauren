@@ -53,9 +53,9 @@ export async function deleteProduct(formData: FormData) {
       },
     });
     revalidatePath("/");
-    return { success: true, message: "Product deleted successfully" };
+    return { ok: true, message: "Product deleted successfully" };
   } catch (error) {
-    return { success: false, message: "Failed to delete product" };
+    return { ok: false, message: "Failed to delete product" };
   }
 }
 export async function updateProduct(

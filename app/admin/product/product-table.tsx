@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import DeleteDialog from "./delete/page";
+import DeleteDialog from "./delete/delete-dialog";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 

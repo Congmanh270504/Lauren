@@ -47,7 +47,7 @@ export async function deleteCategory(categoryId: string) {
   try {
     const category = await prisma.category.delete({
       where: {
-        id: categoryId,
+        id: new ObjectId(categoryId).toString(),
       },
     });
     revalidatePath("/");

@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import UploadFile from "@/components/own/upload-file";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { createProduct } from "@/app/action/toDoAction";
+import { createProduct } from "@/app/action/products";
 
 const page = () => {
   const [imageURL, setImageURL] = useState<string[]>([]);

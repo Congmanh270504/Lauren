@@ -18,8 +18,8 @@ import { Input } from "@/components/ui/input";
 import UploadFile from "@/components/own/upload-file";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { updateProduct } from "@/app/action/toDoAction";
-import { productType } from "@/types/productType";
+import { updateProduct } from "@/app/action/products";
+import { productType } from "@/types/itemTypes";
 
 const EditForm = ({ product }: { product: productType }) => {
   const [imageURL, setImageURL] = useState<string[]>(
