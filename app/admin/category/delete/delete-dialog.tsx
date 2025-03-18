@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Form from "@/components/own/Form";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,27 +14,35 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { deleteCategory } from "@/app/action/category";
+import { deleteCategory, getData } from "@/app/action/category";
 import { Toaster, toast } from "sonner";
 import { fetchCategory } from "@/app/state/category/category";
 import { RootState, AppDispatch } from "@/app/state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { categoryType } from "@/types/itemTypes";
 
 interface DeleteDialogProps {
   id: string;
 }
 
 export default function DeleteDialog({ id }: DeleteDialogProps) {
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const bb = await getData();
+  //     console.log("fsadfasdfdsa", bb);
+  //   };
+  //   fetchData();
+  // }, []);
+
   const dispatch: AppDispatch = useDispatch();
 
   const category = useSelector((state: RootState) => state.category);
-  
+
   useEffect(() => {
     dispatch(fetchCategory());
-    console.log("Category state:", category); // Log the category state
   }, [dispatch]);
-  
+
   const cat = category.find((cat) => cat.id === id);
   const handleDeletecategory = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
@@ -42,10 +50,10 @@ export default function DeleteDialog({ id }: DeleteDialogProps) {
       try {
         const response = await deleteCategory(id);
         if (response && response.ok) {
-          toast.success("Delete category has been successfully");
+          toast.success(response.message);
           dispatch(fetchCategory()); // Refresh the category list after deletion
         } else {
-          toast.error("Delete category has not been failed");
+          toast.error(response.message);
         }
       } catch (error) {
         toast.error("Event has not been created");
@@ -77,7 +85,7 @@ export default function DeleteDialog({ id }: DeleteDialogProps) {
           <Form onSubmit={handleDeletecategory}>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="categoryName" className="text-right">
-                category Name
+                Category Name
               </Label>
               <Input
                 id="categoryName"
@@ -87,8 +95,7 @@ export default function DeleteDialog({ id }: DeleteDialogProps) {
                 readOnly
               />
             </div>
-
-            <DialogFooter>
+            <DialogFooter className="mt-3 gap-2 ">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
                   Cancel

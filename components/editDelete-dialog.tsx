@@ -19,6 +19,7 @@ import { RootState } from "@/app/state/store"; // Import RootState
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import DeleteDialog from "@/app/admin/category/delete/delete-dialog";
+import EditFormDialog from "@/app/admin/category/edit/[id]/editForm";
 
 interface EditDeleteDialogProps {
   id: string;
@@ -50,17 +51,8 @@ export function EditDeleteDialog({ id }: EditDeleteDialogProps) {
             aria-orientation="vertical"
             aria-labelledby="options-menu"
           >
-            <Link href={`/admin/category/edit/${id}`}>
-              <button
-                className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 w-full text-left justify-around"
-                role="menuitem"
-              >
-                Edit
-                <MdEditDocument />
-              </button>
-            </Link>
-           
-              <DeleteDialog id={id} />
+            <EditFormDialog id={id} />
+            <DeleteDialog id={id} />
           </div>
         </div>
       )}

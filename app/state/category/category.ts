@@ -1,28 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { prisma } from "@/utils/prisma";
 import { PrismaClient } from "@prisma/client";
+import { categoryType } from "@/types/itemTypes";
 
-interface CategoryProps {
-  id: string;
-  categoryName: string;
-}
-
-const initialState: CategoryProps[] = [];
+const initialState: categoryType[] = [];
 
 // Create a thunk action to fetch category data
 export const fetchCategory = createAsyncThunk(
   "category/fetchCategory",
   async () => {
-    const data = await prisma.category.findMany();
+    const response = await fetch("/api/categories");
+    const data = await response.json();
     console.log("Fetched data:", data); // Log the fetched data
     return data;
   }
 );
-async function getData() {
-  const prisma = new PrismaClient();
-  const data = await prisma.category.findMany();
-  return data;
-} // Create a slice
+
 
 export const categorySlice = createSlice({
   name: "category",

@@ -10,6 +10,16 @@ interface Data {
   categoryId?: string;
 }
 
+export async function getData() {
+  try {
+    const categories = await prisma.category.findMany();
+    return categories;
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    return [];
+  }
+}
+
 export async function createCategory(data: Data) {
   const { categoryName } = data;
   if (!categoryName.trim()) {
@@ -45,6 +55,17 @@ export async function deleteCategory(categoryId: string) {
     return { ok: false, message: "Category ID is required" };
   }
   try {
+    const existingCategory = await prisma.category.findUnique({
+      where: {
+        id: new ObjectId(categoryId).toString(),
+      },
+      include: {
+        Products: true,
+      },
+    });
+    if (existingCategory) {
+      return { ok: false, message: "Still have products in category" };
+    }
     const category = await prisma.category.delete({
       where: {
         id: new ObjectId(categoryId).toString(),
@@ -55,5 +76,34 @@ export async function deleteCategory(categoryId: string) {
   } catch (error) {
     console.error("Error deleting category:", error);
     return { ok: false, message: "Failed to delete category" };
+  }
+}
+export async function updateCategory(data: Data) {
+  const { categoryName } = data;
+  if (!categoryName.trim()) {
+    return { ok: false, message: "Category name is required" };
+  }
+  try {
+    const existingCategory = await prisma.category.findFirst({
+      where: {
+        categoryName: categoryName,
+      },
+    });
+    if (existingCategory !== null) {
+      return { ok: false, message: "Category name already exists" };
+    }
+    const category = await prisma.category.update({
+      where: {
+        id: new ObjectId(data.categoryId).toString(),
+      },
+      data: {
+        categoryName: categoryName,
+      },
+    });
+    revalidatePath("/");
+    return { ok: true, message: "Category updated successfully" };
+  } catch (error) {
+    console.error("Error updating category:", error);
+    return { ok: false, message: "Failed to update category" };
   }
 }
