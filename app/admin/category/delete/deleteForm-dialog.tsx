@@ -22,11 +22,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { categoryType } from "@/types/itemTypes";
 
-interface DeleteDialogProps {
+interface DeleteFormDialogProps {
   id: string;
 }
 
-export default function DeleteDialog({ id }: DeleteDialogProps) {
+export default function DeleteFormDialog({ id }: DeleteFormDialogProps) {
   // useEffect(() => {
   //   const fetchData = async () => {
   //     const bb = await getData();

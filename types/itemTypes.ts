@@ -9,6 +9,7 @@ export type productType = {
     id: string;
     url: string;
   }[];
+  Category?: categoryType;
 };
 export type categoryType = {
   id: string;

@@ -18,7 +18,7 @@ import { productType } from "@/types/itemTypes";
 import { deleteProduct } from "@/app/action/products";
 import { Toaster, toast } from "sonner";
 
-export default function DeleteDialog({ product }: { product: productType }) {
+export default function DeleteFormDialog({ product }: { product: productType }) {
   const handleDeleteProduct = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();

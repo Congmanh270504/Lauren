@@ -9,9 +9,9 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import DeleteDialog from "./delete/delete-dialog";
+import DeleteDialog from "./delete/deleteForm-dialog";
 import { categoryType } from "@/types/itemTypes";
-import { EditDeleteDialog } from "@/components/editDelete-dialog";
+import { EditDeleteDialog } from "@/app/admin/category/editDelete-dialog";
 import { useDispatch, useSelector } from "react-redux";
 import { handleClickOutside } from "@/app/state/modify/modifyItem";
 import { FaPlus } from "react-icons/fa6";
@@ -131,7 +131,6 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
         </div>
       </div>
 
-      {/* Help button */}
       <div className="fixed bottom-6 right-6">
         <Link href={`/admin/category/create`}>
           <button className="relative bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg group">

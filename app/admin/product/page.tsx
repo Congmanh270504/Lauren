@@ -7,6 +7,7 @@ async function getData() {
   const data = await prisma.products.findMany({
     include: {
       img: true,
+      Category: true,
     },
   });
   return data;

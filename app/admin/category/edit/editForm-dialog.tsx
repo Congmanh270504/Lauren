@@ -32,7 +32,7 @@ import { categoryType } from "@/types/itemTypes";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { formSchema } from "../../form-schema";
+import { formSchema } from "../form-schema";
 import { useForm } from "react-hook-form";
 import { MdEditDocument } from "react-icons/md";
 
@@ -114,16 +114,6 @@ const EditFormDialog = ({ id }: EditFormDialogProps) => {
                     </FormItem>
                   )}
                 />
-
-                {/* <Label htmlFor="categoryName" className="text-right">
-                  Category Name
-                </Label>
-                <Input
-                  id="categoryName"
-                  name="categoryName"
-                  defaultValue={cat ? cat.categoryName : ""}
-                  className="col-span-3"
-                /> */}
               </div>
               <DialogFooter className="mt-3 gap-2 ">
                 <DialogClose asChild>
