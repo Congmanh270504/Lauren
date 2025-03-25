@@ -7,12 +7,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { pinata } from "@/utils/config";
+import { imagesTpye } from "@/types/itemTypes";
 
 interface UploadFileProps {
-  imageURL: { id: string; cid: string }[];
-  setImageURL: React.Dispatch<
-    React.SetStateAction<{ id: string; cid: string }[]>
-  >;
+  imageURL: imagesTpye[];
+  setImageURL: React.Dispatch<React.SetStateAction<imagesTpye[]>>;
   field: any; // Add this line to accept the field object from react-hook-form
 }
 
@@ -21,8 +20,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
   setImageURL,
   field, // Add this line to accept the field object from react-hook-form
 }) => {
-  const prevImageURLRef = useRef<{ id: string; cid: string }[]>(imageURL);
-  const [cid, setCid] = React.useState<string[] | null>([]);
+  const prevImageURLRef = useRef<imagesTpye[]>(imageURL);
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
@@ -56,30 +54,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
       }
     }
   };
-
-  const handleGetImages = async (cid: string) => {
-    try {
-      const response = await fetch(`/api/products/${cid}`, {
-        method: "GET",
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch images");
-      }
-      const imageUrl = await response.json(); // Get the response as a string
-      // imga
-      return imageUrl;
-    } catch (error) {
-      console.error("Error fetching images:", error);
-      toast.error("Failed to fetch images");
-    }
-  };
-
-  const aa = handleGetImages(
-    "bafkreig5tt5s3jmvn22gk6avgf52bympvakc22v7tdmewajph65czwesnu"
-  );
-  console.log("response", aa);
-
-  console.log("cid", cid);
+  console.log("Trang UploadFile", imageURL);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -101,12 +76,12 @@ const UploadFile: React.FC<UploadFileProps> = ({
   };
 
   // Update the form field when imageURL changes
-  // useEffect(() => {
-  //   if (prevImageURLRef.current !== imageURL) {
-  //     field.onChange(imageURL);
-  //     prevImageURLRef.current = imageURL;
-  //   }
-  // }, [imageURL, field]);
+  useEffect(() => {
+    if (prevImageURLRef.current !== imageURL) {
+      field.onChange(imageURL);
+      prevImageURLRef.current = imageURL;
+    }
+  }, [imageURL, field]);
 
   return (
     <div className="flex items-center justify-center w-full">
@@ -122,10 +97,12 @@ const UploadFile: React.FC<UploadFileProps> = ({
                 key={i}
               >
                 <Image
-                  src={img.cid || "/placeholder.svg"}
+                  src={img.url || "/placeholder.svg"}
                   alt="Uploaded image"
                   fill
                   className="object-cover"
+                  sizes="200px"
+                  quality={100}
                 />
                 <Button
                   variant="outline"
@@ -162,12 +139,6 @@ const UploadFile: React.FC<UploadFileProps> = ({
               SVG, PNG, JPG or GIF (MAX. 800x400px)
             </p>
           </div>
-          // <Image
-          //   src={aa || "/placeholder.svg"}
-          //   alt="Uploaded image"
-          //   fill
-          //   className="object-cover"
-          // />
         )}
         <Input
           id="productsImages"

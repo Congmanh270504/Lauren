@@ -3,26 +3,27 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/utils/prisma";
 import { object } from "zod";
 import { ObjectId } from "mongodb";
-import { productImageType } from "@/types/itemTypes";
+import { imagesTpye } from "@/types/itemTypes";
 import { productType } from "@/types/itemTypes";
 
 export async function createProduct(
   data: productType,
-  productsImages: productImageType[]
+  productsImages: string[]
 ) {
   if (!data.productName.trim()) {
     return { ok: false, message: "Product name is required" };
   }
+  console.log("fadfasdf");
   try {
     const product = await prisma.products.create({
       data: {
         productName: data.productName,
         price: data.price,
-        categoryId: data.Category?.id, // bug here
+        categoryId: data.categoryId, // updated
         img: {
           create: productsImages.map((img) => ({
-            cid: img.cid,
-            url: img.url,
+            
+            url: img,
           })),
         },
       },

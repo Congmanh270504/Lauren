@@ -36,7 +36,6 @@ model Images {
   productId  String   @db.ObjectId
   Products   Products @relation(fields: [productId], references: [id])
   url        String
-  cid        String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }

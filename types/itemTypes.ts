@@ -1,11 +1,11 @@
 export type productType = {
-  id: string;
+  id?: string;
   productName: string;
   price: number;
   categoryId: string;
   createdAt?: Date;
   updatedAt?: Date;
-  img?: Images[];
+  img?: imagesTpye[];
   Category?: categoryType;
 };
 export type categoryType = {
@@ -14,8 +14,11 @@ export type categoryType = {
   createdAt?: Date;
   updatedAt?: Date;
 };
-export type Images = {
+export type imagesTpye = {
   id: string;
-  url?: string;
-  cid?: string | null;
+  productId: string;
+  url: string;
+  cid?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

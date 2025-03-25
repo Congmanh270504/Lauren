@@ -8,6 +8,7 @@ export interface ActionResponse<T = any> {
   };
   inputs?: T;
 }
+
 export const formSchema = z.object({
   productName: z
     .string({ message: "Product name is required" })
@@ -17,6 +18,8 @@ export const formSchema = z.object({
     .number()
     .min(0.5, { message: "Price must be at least 0.5" })
     .max(1000000, { message: "Price must be at most 1000000" }),
-  categoryName: z.string().nonempty({ message: "Category is required" }),
-  productsImages: z.array(z.string()).min(1, { message: "At least 1 image" }),
+  categoryId: z.string().nonempty({ message: "Category is required" }),
+  // productsImages: z
+  //   .array(z.string().nonempty(""))
+  //   .min(1, { message: "At least 1 image" }),
 });

@@ -10,19 +10,14 @@ export async function POST(request: NextRequest) {
       console.error("No file received");
       return NextResponse.json({ error: "No file received" }, { status: 400 });
     }
-
-    console.log("File received:", file);
-
     const uploadData = await pinata.upload.private.file(file);
-    console.log("Upload data:", uploadData);
-
-    const url = await pinata.upload.private.createSignedURL({
+    const upload = await pinata.upload.private.createSignedURL({
       expires: 3600,
     });
-
-    console.log("Signed URL:", url, uploadData.cid);
-    console.table(uploadData);
-
+    const url = await pinata.gateways.private.createAccessLink({
+      cid: uploadData.cid,
+      expires: 30,
+    });
     return NextResponse.json(
       { url, id: uploadData.id, cid: uploadData.cid },
       { status: 200 }
