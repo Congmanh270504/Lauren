@@ -6,10 +6,13 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { pinata } from "@/utils/config";
 
 interface UploadFileProps {
-  imageURL: string[];
-  setImageURL: React.Dispatch<React.SetStateAction<string[]>>;
+  imageURL: { id: string; cid: string }[];
+  setImageURL: React.Dispatch<
+    React.SetStateAction<{ id: string; cid: string }[]>
+  >;
   field: any; // Add this line to accept the field object from react-hook-form
 }
 
@@ -18,8 +21,8 @@ const UploadFile: React.FC<UploadFileProps> = ({
   setImageURL,
   field, // Add this line to accept the field object from react-hook-form
 }) => {
-  const prevImageURLRef = useRef<string[]>(imageURL);
-
+  const prevImageURLRef = useRef<{ id: string; cid: string }[]>(imageURL);
+  const [cid, setCid] = React.useState<string[] | null>([]);
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files) {
@@ -54,21 +57,56 @@ const UploadFile: React.FC<UploadFileProps> = ({
     }
   };
 
+  const handleGetImages = async (cid: string) => {
+    try {
+      const response = await fetch(`/api/products/${cid}`, {
+        method: "GET",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch images");
+      }
+      const imageUrl = await response.json(); // Get the response as a string
+      // imga
+      return imageUrl;
+    } catch (error) {
+      console.error("Error fetching images:", error);
+      toast.error("Failed to fetch images");
+    }
+  };
+
+  const aa = handleGetImages(
+    "bafkreig5tt5s3jmvn22gk6avgf52bympvakc22v7tdmewajph65czwesnu"
+  );
+  console.log("response", aa);
+
+  console.log("cid", cid);
+
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const handleClosed = (url: string) => {
+
+  const handleClosed = async (id: string) => {
+    const data = new FormData();
+    data.set("id", id);
+    const response = await fetch("/api/deleteFiles", {
+      method: "DELETE",
+      body: data,
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete file");
+    }
+
     setImageURL((prev) => {
-      const newURLs = prev.filter((item) => item !== url);
+      const newURLs = prev.filter((item) => item.id !== id);
       return newURLs;
     });
   };
 
   // Update the form field when imageURL changes
-  useEffect(() => {
-    if (prevImageURLRef.current !== imageURL) {
-      field.onChange(imageURL);
-      prevImageURLRef.current = imageURL;
-    }
-  }, [imageURL, field]);
+  // useEffect(() => {
+  //   if (prevImageURLRef.current !== imageURL) {
+  //     field.onChange(imageURL);
+  //     prevImageURLRef.current = imageURL;
+  //   }
+  // }, [imageURL, field]);
 
   return (
     <div className="flex items-center justify-center w-full">
@@ -78,13 +116,13 @@ const UploadFile: React.FC<UploadFileProps> = ({
       >
         {imageURL.length > 0 ? (
           <div className="grid grid-cols-3 gap-2 p-2">
-            {imageURL.map((url, i) => (
+            {imageURL.map((img, i) => (
               <div
                 className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
                 key={i}
               >
                 <Image
-                  src={url || "/placeholder.svg"}
+                  src={img.cid || "/placeholder.svg"}
                   alt="Uploaded image"
                   fill
                   className="object-cover"
@@ -92,7 +130,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
                 <Button
                   variant="outline"
                   className="absolute top-1 right-1 border-none rounded-full bg-[#EAEAEA] text-[#443627] px-3 py-22"
-                  onClick={() => handleClosed(url)}
+                  onClick={() => handleClosed(img.id)}
                 >
                   X
                 </Button>
@@ -118,12 +156,18 @@ const UploadFile: React.FC<UploadFileProps> = ({
             </svg>
             <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
               <span className="font-semibold">Click to upload</span> or drag and
-              drop
+              drop //{" "}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               SVG, PNG, JPG or GIF (MAX. 800x400px)
             </p>
           </div>
+          // <Image
+          //   src={aa || "/placeholder.svg"}
+          //   alt="Uploaded image"
+          //   fill
+          //   className="object-cover"
+          // />
         )}
         <Input
           id="productsImages"

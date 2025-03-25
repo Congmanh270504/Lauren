@@ -4,7 +4,7 @@ import CategoryTable from "./category-table";
 
 async function getData() {
   const prisma = new PrismaClient();
-  const data = await prisma.category.findMany();
+  const data = await prisma.categories.findMany();
   return data;
 }
 

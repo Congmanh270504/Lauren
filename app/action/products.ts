@@ -3,26 +3,26 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/utils/prisma";
 import { object } from "zod";
 import { ObjectId } from "mongodb";
-interface Data {
-  productName: string;
-  price: number;
-  categoryId: string;
-}
-export async function createProduct(data: Data, productsImages: string[]) {
-  const { productName, price, categoryId } = data;
-  console.log(productName, price, categoryId);
-  if (!productName.trim()) {
+import { productImageType } from "@/types/itemTypes";
+import { productType } from "@/types/itemTypes";
+
+export async function createProduct(
+  data: productType,
+  productsImages: productImageType[]
+) {
+  if (!data.productName.trim()) {
     return { ok: false, message: "Product name is required" };
   }
   try {
     const product = await prisma.products.create({
       data: {
-        productName: productName,
-        price: price,
-        categoryId: categoryId,
+        productName: data.productName,
+        price: data.price,
+        categoryId: data.Category?.id, // bug here
         img: {
-          create: productsImages.map((url) => ({
-            url,
+          create: productsImages.map((img) => ({
+            cid: img.cid,
+            url: img.url,
           })),
         },
       },
@@ -34,22 +34,19 @@ export async function createProduct(data: Data, productsImages: string[]) {
     return { ok: false, message: "Failed to create product" };
   }
 }
-export async function deleteProduct(formData: FormData) {
+export async function deleteProduct(id: string) {
   try {
-    const productName = formData.get("productName") as string;
-    if (!productName.trim()) {
+    if (!id.trim()) {
       return;
     }
-    await prisma.image.deleteMany({
+    await prisma.images.deleteMany({
       where: {
-        Products: {
-          productName: productName,
-        },
+        productId: new ObjectId(id).toString(),
       },
     });
     await prisma.products.delete({
       where: {
-        productName: productName,
+        id: new ObjectId(id).toString(),
       },
     });
     revalidatePath("/");
@@ -72,7 +69,7 @@ export async function updateProduct(
     return { ok: false, message: "Product name is required" };
   }
   try {
-    await prisma.image.deleteMany({
+    await prisma.images.deleteMany({
       where: {
         productId: new ObjectId(id).toString(),
       },
@@ -86,11 +83,11 @@ export async function updateProduct(
         productName: productName,
         price: price,
         categoryId: categoryId,
-        img: {
-          create: productsImages.map((url) => ({
-            url,
-          })),
-        },
+        // img: {
+        //   create: productsImages.map((url) => ({ // bug here
+        //     cid: url,
+        //   })),
+        // },
       },
     });
     return { ok: true, message: "Product updated successfully" };

@@ -1,11 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import categoryReducer from "./category/category";
+import categoryReducer from "./categories/categories";
 import modifyItemReducer from "./modify/modifyItem";
-
+import productImageReducer from "./images/images";
 export const store = configureStore({
   reducer: {
     category: categoryReducer,
     modifyItem: modifyItemReducer,
+    productImage: productImageReducer,
   },
 });
 

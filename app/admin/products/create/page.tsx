@@ -20,9 +20,18 @@ import UploadFile from "@/components/own/upload-file";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/app/action/products";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { productImageType } from "@/types/itemTypes";
 const page = () => {
-  const [imageURL, setImageURL] = useState<string[]>([]);
+  const [imageURL, setImageURL] = useState<productImageType[]>([]);
   const router = useRouter();
 
   const initialState = {
@@ -34,7 +43,7 @@ const page = () => {
     defaultValues: {
       productName: "",
       price: 0,
-      categoryId: "",
+      categoryName: "",
       productsImages: [],
     },
   });
@@ -116,7 +125,7 @@ const page = () => {
           </div>
           <FormField
             control={form.control}
-            name="categoryId"
+            name="categoryName"
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>Category</FormLabel> *
@@ -131,6 +140,24 @@ const page = () => {
                       field.onChange(val);
                     }}
                   />
+                  {/* <Select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Select a fruit" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Category</SelectLabel>
+                        {
+                        }
+                        <SelectItem value="apple">Apple</SelectItem>
+                        <SelectItem value="banana">Banana</SelectItem>
+                        <SelectItem value="blueberry">Blueberry</SelectItem>
+                        <SelectItem value="grapes">Grapes</SelectItem>
+                        <SelectItem value="pineapple">Pineapple</SelectItem>
+
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select> */}
                 </FormControl>
                 <FormMessage />
               </FormItem>

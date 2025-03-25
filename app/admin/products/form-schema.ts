@@ -17,6 +17,6 @@ export const formSchema = z.object({
     .number()
     .min(0.5, { message: "Price must be at least 0.5" })
     .max(1000000, { message: "Price must be at most 1000000" }),
-  categoryId: z.string().nonempty({ message: "Category is required" }),
+  categoryName: z.string().nonempty({ message: "Category is required" }),
   productsImages: z.array(z.string()).min(1, { message: "At least 1 image" }),
 });

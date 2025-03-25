@@ -5,10 +5,7 @@ export type productType = {
   categoryId: string;
   createdAt?: Date;
   updatedAt?: Date;
-  img?: {
-    id: string;
-    url: string;
-  }[];
+  img?: Images[];
   Category?: categoryType;
 };
 export type categoryType = {
@@ -16,4 +13,9 @@ export type categoryType = {
   categoryName: string;
   createdAt?: Date;
   updatedAt?: Date;
+};
+export type Images = {
+  id: string;
+  url?: string;
+  cid?: string | null;
 };

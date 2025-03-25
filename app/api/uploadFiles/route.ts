@@ -13,16 +13,20 @@ export async function POST(request: NextRequest) {
 
     console.log("File received:", file);
 
-    const uploadData = await pinata.upload.file(file);
+    const uploadData = await pinata.upload.private.file(file);
     console.log("Upload data:", uploadData);
 
-    const url = await pinata.gateways.createSignedURL({
-      cid: uploadData.cid,
+    const url = await pinata.upload.private.createSignedURL({
       expires: 3600,
     });
-    console.log("Signed URL:", url);
 
-    return NextResponse.json(url, { status: 200 });
+    console.log("Signed URL:", url, uploadData.cid);
+    console.table(uploadData);
+
+    return NextResponse.json(
+      { url, id: uploadData.id, cid: uploadData.cid },
+      { status: 200 }
+    );
   } catch (e) {
     console.error("Error during file upload:", e);
     return NextResponse.json(

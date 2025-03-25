@@ -13,12 +13,14 @@ async function getData() {
   return data;
 }
 
+
 const page = async () => {
-  const product = await getData();
+  const products = await getData();
+ 
   return (
     <div>
       <h1>Product</h1>
-      <ProductTable product={product} />
+      <ProductTable products={products} />
     </div>
   );
 };

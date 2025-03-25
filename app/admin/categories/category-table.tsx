@@ -2,31 +2,24 @@
 import React, { useState } from "react";
 import { Prisma } from "@prisma/client";
 import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import DeleteDialog from "./delete/delete-dialog";
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  MoreVertical,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import DeleteDialog from "./delete/deleteForm-dialog";
+import { categoryType } from "@/types/itemTypes";
+import { EditDeleteDialog } from "@/app/admin/categories/editDelete-dialog";
+import { useDispatch, useSelector } from "react-redux";
 import { handleClickOutside } from "@/app/state/modify/modifyItem";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import { FaPlus } from "react-icons/fa";
-import { useDispatch } from "react-redux";
-import EditDeleteDialog from "./editDelete-dialog";
-
-type ProductWithImages = Prisma.ProductsGetPayload<{
-  include: { img: true; Category: true };
-}>;
-
-interface ProductTableProps {
-  product: ProductWithImages[];
+import { FaPlus } from "react-icons/fa6";
+interface CategoryTableProps {
+  category: categoryType[];
 }
-const ProductTable: React.FC<ProductTableProps> = ({ product }) => {
+
+const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const dispatch = useDispatch();
@@ -44,19 +37,13 @@ const ProductTable: React.FC<ProductTableProps> = ({ product }) => {
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Product name
+                  Category name
                 </th>
                 <th
                   scope="col"
                   className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Price
-                </th>
-                <th
-                  scope="col"
-                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Category
+                  Create at
                 </th>
                 <th
                   scope="col"
@@ -70,13 +57,13 @@ const ProductTable: React.FC<ProductTableProps> = ({ product }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {product.map((pro) => (
-                <tr key={pro.id} className="hover:bg-gray-50">
+              {category.map((cat) => (
+                <tr key={cat.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center sm:table-cell">
-                      {pro.productName ? (
+                      {cat.categoryName ? (
                         <span className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl">
-                          {pro.productName.charAt(0)}
+                          {cat.categoryName.charAt(0)}
                         </span>
                       ) : (
                         ""
@@ -84,22 +71,20 @@ const ProductTable: React.FC<ProductTableProps> = ({ product }) => {
                     </div>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {pro.productName}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                    {pro.price}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                    {pro.Category.categoryName}
+                    {cat.categoryName}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm text-blue-600">
-                    {pro.createdAt
-                      ? new Date(pro.createdAt).toLocaleDateString()
+                    {cat.createdAt
+                      ? new Date(cat.createdAt).toLocaleDateString()
                       : "N/A"}
                   </td>
-
+                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                    {cat.updatedAt
+                      ? new Date(cat.updatedAt).toLocaleDateString()
+                      : "N/A"}
+                  </td>
                   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                    <EditDeleteDialog product={pro} />
+                    <EditDeleteDialog id={cat.id.toString()} />
                     {/* <MoreVertical className="h-5 w-5" /> */}
                   </td>
                 </tr>
@@ -147,10 +132,10 @@ const ProductTable: React.FC<ProductTableProps> = ({ product }) => {
       </div>
 
       <div className="fixed bottom-6 right-6">
-        <Link href={`/admin/product/create`}>
+        <Link href={`/admin/category/create`}>
           <button className="relative bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg group">
             <span className="absolute left-[-125px] top-1/2 transform -translate-y-1/2 bg-gray-500 text-white text-sm rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              Create product
+              Create Category
             </span>
             <FaPlus />
           </button>
@@ -159,4 +144,5 @@ const ProductTable: React.FC<ProductTableProps> = ({ product }) => {
     </div>
   );
 };
-export default ProductTable;
+
+export default CategoryTable;

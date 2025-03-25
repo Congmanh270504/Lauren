@@ -18,13 +18,12 @@ import { toggleDropdown } from "@/app/state/modify/modifyItem";
 import { RootState } from "@/app/state/store"; // Import RootState
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
-import DeleteFormDialog from "@/app/admin/category/delete/deleteForm-dialog";
-import EditFormDialog from "@/app/admin/category/edit/editForm-dialog";
+import DeleteFormDialog from "@/app/admin/categories/delete/deleteForm-dialog";
+import EditFormDialog from "@/app/admin/categories/edit/editForm-dialog";
 interface EditDeleteDialogProps {
   id: string;
 }
 export function EditDeleteDialog({ id }: EditDeleteDialogProps) {
-
   const activeDropdown = useSelector(
     (state: RootState) => state.modifyItem.activeDropdown
   );

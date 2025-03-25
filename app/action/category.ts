@@ -12,7 +12,7 @@ interface Data {
 
 export async function getData() {
   try {
-    const categories = await prisma.category.findMany();
+    const categories = await prisma.categories.findMany();
     return categories;
   } catch (error) {
     console.error("Error fetching categories:", error);
@@ -26,7 +26,7 @@ export async function createCategory(data: Data) {
     return { ok: false, message: "Category name is required" };
   }
   try {
-    const existingCategory = await prisma.category.findFirst({
+    const existingCategory = await prisma.categories.findFirst({
       where: {
         categoryName: categoryName,
       },
@@ -38,7 +38,7 @@ export async function createCategory(data: Data) {
     }
 
     // Create the new category
-    const category = await prisma.category.create({
+    const category = await prisma.categories.create({
       data: {
         categoryName: categoryName,
       },
@@ -55,7 +55,7 @@ export async function deleteCategory(categoryId: string) {
     return { ok: false, message: "Category ID is required" };
   }
   try {
-    const existingCategory = await prisma.category.findUnique({
+    const existingCategory = await prisma.categories.findUnique({
       where: {
         id: new ObjectId(categoryId).toString(),
       },
@@ -66,7 +66,7 @@ export async function deleteCategory(categoryId: string) {
     if (existingCategory) {
       return { ok: false, message: "Still have products in category" };
     }
-    const category = await prisma.category.delete({
+    const category = await prisma.categories.delete({
       where: {
         id: new ObjectId(categoryId).toString(),
       },
@@ -84,7 +84,7 @@ export async function updateCategory(data: Data) {
     return { ok: false, message: "Category name is required" };
   }
   try {
-    const existingCategory = await prisma.category.findFirst({
+    const existingCategory = await prisma.categories.findFirst({
       where: {
         categoryName: categoryName,
       },
@@ -92,7 +92,7 @@ export async function updateCategory(data: Data) {
     if (existingCategory !== null) {
       return { ok: false, message: "Category name already exists" };
     }
-    const category = await prisma.category.update({
+    const category = await prisma.categories.update({
       where: {
         id: new ObjectId(data.categoryId).toString(),
       },

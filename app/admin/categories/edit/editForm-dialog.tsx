@@ -24,7 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deleteCategory, getData, updateCategory } from "@/app/action/category";
 import { Toaster, toast } from "sonner";
-import { fetchCategory } from "@/app/state/category/category";
+import { fetchCategory } from "@/app/state/categories/categories";
 import { RootState, AppDispatch } from "@/app/state/store";
 import { useDispatch, useSelector } from "react-redux";
 import { FaRegTrashAlt } from "react-icons/fa";

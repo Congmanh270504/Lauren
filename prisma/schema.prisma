@@ -17,13 +17,13 @@ model Products {
   productName String   @unique
   price       Float
   categoryId  String   @db.ObjectId
-  Category    Category @relation(fields: [categoryId], references: [id])
-  img         Image[]
+  Category    Categories @relation(fields: [categoryId], references: [id])
+  img         Images[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-model Category {
+model Categories {
   id           String     @id @default(auto()) @map("_id") @db.ObjectId
   categoryName String     @unique
   createdAt    DateTime   @default(now())
@@ -31,15 +31,16 @@ model Category {
   Products     Products[]
 }
 
-model Image {
+model Images {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
   productId  String   @db.ObjectId
   Products   Products @relation(fields: [productId], references: [id])
   url        String
+  cid        String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
-model User {
+model Users {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
   password String

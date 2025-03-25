@@ -17,14 +17,18 @@ import { Label } from "@/components/ui/label";
 import { productType } from "@/types/itemTypes";
 import { deleteProduct } from "@/app/action/products";
 import { Toaster, toast } from "sonner";
-
-export default function DeleteFormDialog({ product }: { product: productType }) {
+import { FaRegTrashAlt } from "react-icons/fa";
+export default function DeleteFormDialog({
+  products,
+}: {
+  products: productType;
+}) {
   const handleDeleteProduct = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       const formData = new FormData(event.currentTarget);
       try {
-        const response = await deleteProduct(formData);
+        const response = await deleteProduct(products.id);
         if (response && response.ok) {
           toast.success("Delete product has been successfully");
         } else {
@@ -39,17 +43,22 @@ export default function DeleteFormDialog({ product }: { product: productType }) 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Delete Product</Button>
+        <button
+          className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-gray-100 hover:text-red-700 w-full text-left text-md justify-around"
+          role="menuitem"
+        >
+          Delete <FaRegTrashAlt />
+        </button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[520px]">
         <DialogHeader>
-          <DialogTitle>Delete Product</DialogTitle>
+          <DialogTitle className="text-red-600">Delete Product</DialogTitle>
           <DialogDescription>
             Make sure you want to delete product here. Click save when you're
             done.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4 py-6 ">
           <Form onSubmit={handleDeleteProduct}>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="productName" className="text-right">
@@ -58,45 +67,45 @@ export default function DeleteFormDialog({ product }: { product: productType }) 
               <Input
                 id="productName"
                 name="productName"
-                defaultValue={product.productName}
+                defaultValue={products.productName}
                 className="col-span-3"
                 readOnly
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-4 items-center gap-4 mt-2">
               <Label htmlFor="username" className="text-right">
-                CategoryId
+                Category name
               </Label>
               <Input
                 id="categoryId"
-                defaultValue={product.categoryId.toString()}
+                defaultValue={products.Category?.categoryName}
                 className="col-span-3"
                 readOnly
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-4 items-center gap-4 mt-2">
               <Label htmlFor="username" className="text-right">
                 Price
               </Label>
               <Input
                 id="price"
-                defaultValue={product.price.toString()}
+                defaultValue={products.price.toString()}
                 className="col-span-3"
                 readOnly
               />
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            <div className="grid grid-cols-4 items-center gap-4 mt-2">
               <Label htmlFor="username" className="text-right">
                 Price
               </Label>
               <Input
                 id="price"
-                defaultValue={product.price.toString()}
+                defaultValue={products.price.toString()}
                 className="col-span-3"
                 readOnly
               />
             </div>
-            <DialogFooter>
+            <DialogFooter className="mt-3 gap-2 ">
               <DialogClose asChild>
                 <Button type="button" variant="secondary">
                   Cancel
