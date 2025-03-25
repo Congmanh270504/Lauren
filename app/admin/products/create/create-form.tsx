@@ -32,6 +32,7 @@ import {
 import { categoryType, imagesTpye } from "@/types/itemTypes";
 const CreateForm = ({ categories }: { categories: categoryType[] }) => {
   const [imageURL, setImageURL] = useState<imagesTpye[]>([]);
+
   const router = useRouter();
 
   const initialState = {
@@ -44,7 +45,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
       productName: "",
       price: 0,
       categoryId: "",
-    //   productsImages: [],
+      productsImages: [],
     },
   });
   const [state, action, isPending] = React.useActionState(
@@ -53,13 +54,10 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
   );
 
   console.log("Trang page", imageURL);
-  const imagesCid = imageURL
-    .map((item) => item.cid)
-    .filter((cid) => cid !== undefined) as string[];
-  console.log("Trang page", imagesCid);
+
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const response = await createProduct(data, imagesCid);
+      const response = await createProduct(data);
       if (response.ok) {
         toast.success("Thêm sản phẩm thành công.");
         router.push("/");
@@ -70,7 +68,6 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
     } catch (error) {
       toast.error("Đã xảy ra lỗi khi thêm sản phẩm. Vui lòng thử lại.");
     }
-    console.log("fadsfadsfadsf");
   };
 
   return (
@@ -161,14 +158,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
             render={({ field }) => (
               <FormItem className="w-full">
                 <FormLabel>Upload file image</FormLabel> *
-                <FormControl
-                  onChange={(e) => {
-                    const imagesCid = imageURL
-                      .map((item) => item.cid)
-                      .filter((cid) => cid !== undefined) as string[];
-                    field.onChange(imagesCid);
-                  }}
-                >
+                <FormControl>
                   <UploadFile
                     imageURL={imageURL}
                     setImageURL={setImageURL}

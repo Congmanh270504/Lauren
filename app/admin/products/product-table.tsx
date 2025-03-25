@@ -76,8 +76,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                     <div className="flex items-center sm:table-cell">
                       <span className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl">
                         {pro.img && pro.img.length ? (
-
-                          
                           <Image
                             src={pro.img[0].url}
                             width={100}

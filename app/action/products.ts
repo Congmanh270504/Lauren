@@ -6,10 +6,13 @@ import { ObjectId } from "mongodb";
 import { imagesTpye } from "@/types/itemTypes";
 import { productType } from "@/types/itemTypes";
 
-export async function createProduct(
-  data: productType,
-  productsImages: string[]
-) {
+interface dataType {
+  productName: string;
+  price: number;
+  categoryId: string;
+  productsImages: string[];
+}
+export async function createProduct(data: dataType) {
   if (!data.productName.trim()) {
     return { ok: false, message: "Product name is required" };
   }
@@ -21,8 +24,7 @@ export async function createProduct(
         price: data.price,
         categoryId: data.categoryId, // updated
         img: {
-          create: productsImages.map((img) => ({
-            
+          create: data.productsImages.map((img) => ({
             url: img,
           })),
         },

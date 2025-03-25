@@ -74,13 +74,18 @@ const UploadFile: React.FC<UploadFileProps> = ({
       return newURLs;
     });
   };
-
+  
   // Update the form field when imageURL changes
   useEffect(() => {
     if (prevImageURLRef.current !== imageURL) {
-      field.onChange(imageURL);
+      field.onChange(
+        imageURL
+          .map((item) => item.cid)
+          .filter((cid) => cid !== undefined) as string[]
+      );
       prevImageURLRef.current = imageURL;
     }
+    console.log("field", field.value);
   }, [imageURL, field]);
 
   return (
