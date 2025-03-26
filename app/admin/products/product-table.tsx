@@ -25,8 +25,12 @@ type ProductWithImages = Prisma.ProductsGetPayload<{
 
 interface ProductTableProps {
   products: ProductWithImages[];
+  productImages: string[];
 }
-const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
+const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  productImages,
+}) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const dispatch = useDispatch();
@@ -77,7 +81,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                       <span className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl">
                         {pro.img && pro.img.length ? (
                           <Image
-                            src={pro.img[0].url}
+                            src={
+                              productImages.find((img) =>
+                                img.includes(pro.img[0].url)
+                              ) || "/path/to/default/image.jpg"
+                            }
                             width={100}
                             height={100}
                             alt="Picture of the author"

@@ -110,7 +110,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
                 className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
                 key={i}
               >
-                <Image
+                <Image // if get error 500, make the user can't upload the image
                   src={img.url || "/placeholder.svg"}
                   alt="Uploaded image"
                   fill

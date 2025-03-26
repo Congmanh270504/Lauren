@@ -17,7 +17,6 @@ export async function createProduct(data: dataType) {
   if (!data.productName.trim()) {
     return { ok: false, message: "Product name is required" };
   }
-  console.log("fadfasdf");
   try {
     const product = await prisma.products.create({
       data: {
@@ -43,6 +42,11 @@ export async function deleteProduct(id: string) {
     if (!id.trim()) {
       return;
     }
+    const images = await prisma.images.findMany({
+      where: {
+        productId: new ObjectId(id).toString(),
+      },
+    });
     await prisma.images.deleteMany({
       where: {
         productId: new ObjectId(id).toString(),
@@ -53,6 +57,17 @@ export async function deleteProduct(id: string) {
         id: new ObjectId(id).toString(),
       },
     });
+    const files = await pinata.files.private.list(); // files{files: [{}]} type files
+    console.log(files);
+    const imageUrls = files.files.filter((file) =>
+      images.map((img) => img.url).includes(file.cid)
+    );
+    console.log(imageUrls);
+    const deleteFiles = imageUrls.map((file) => file.id);
+    // const imageUrls = files.map((file) => file.);
+    // await pinata.files.private.delete(files);
+
+    await pinata.files.private.delete(deleteFiles);
     revalidatePath("/");
     return { ok: true, message: "Product deleted successfully" };
   } catch (error) {
@@ -101,7 +116,7 @@ export async function updateProduct(
 }
 export async function getProductsImages(products: productType[]) {
   if (!products || products.length === 0) {
-    return { ok: false, message: "No products found" };
+    return [];
   }
   try {
     // Map through the products and extract the first image URL for each product
@@ -121,10 +136,9 @@ export async function getProductsImages(products: productType[]) {
 
     // Filter out null values
     const validImages = images.filter((url) => url !== null) as string[];
-
-    return { ok: true, images: validImages };
+    return validImages;
   } catch (error) {
     console.error("Error getting product images:", error);
-    return { ok: false, message: "Failed to get product images" };
+    return [];
   }
 }

@@ -26,8 +26,11 @@ export default function DeleteFormDialog({
   const handleDeleteProduct = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      const formData = new FormData(event.currentTarget);
       try {
+        if (!products.id) {
+          toast.error("Product ID is missing");
+          return;
+        }
         const response = await deleteProduct(products.id);
         if (response && response.ok) {
           toast.success("Delete product has been successfully");
@@ -79,17 +82,6 @@ export default function DeleteFormDialog({
               <Input
                 id="categoryId"
                 defaultValue={products.Category?.categoryName}
-                className="col-span-3"
-                readOnly
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4 mt-2">
-              <Label htmlFor="username" className="text-right">
-                Price
-              </Label>
-              <Input
-                id="price"
-                defaultValue={products.price.toString()}
                 className="col-span-3"
                 readOnly
               />
