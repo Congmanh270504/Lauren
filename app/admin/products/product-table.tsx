@@ -88,12 +88,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ products }) => {
                         )}
                       </span>
                     </div>
-                    {/* <img
-                      src={pro.img[0].url}
-                      alt="product image"
-                     
-                      className="object-cover"
-                    /> */}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                     {pro.productName}

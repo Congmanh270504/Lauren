@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { pinata } from "@/utils/config";
 import { imagesTpye } from "@/types/itemTypes";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/state/store";
+import { setImages } from "@/app/state/images/images";
 
 interface UploadFileProps {
   imageURL: imagesTpye[];
@@ -20,6 +23,10 @@ const UploadFile: React.FC<UploadFileProps> = ({
   setImageURL,
   field, // Add this line to accept the field object from react-hook-form
 }) => {
+  const dispatch: AppDispatch = useDispatch();
+
+  const aa = useSelector((state: RootState) => state.productImage);
+
   const prevImageURLRef = useRef<imagesTpye[]>(imageURL);
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -43,10 +50,11 @@ const UploadFile: React.FC<UploadFileProps> = ({
         if (imageURL.find((item) => uploadedURLs.includes(item))) {
           toast.error("Already uploaded");
         } else {
-          setImageURL((prev) => {
-            const newURLs = [...prev, ...uploadedURLs];
-            return Array.from(new Set(newURLs)); // Ensure unique URLs
-          });
+          const newImageURLs = [...imageURL, ...uploadedURLs];
+          setImageURL(newImageURLs);
+
+          // Dispatch the setImages action to update the Redux state
+          dispatch(setImages(newImageURLs));
         }
       } catch (error) {
         console.error("Error uploading files:", error);
@@ -54,6 +62,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
       }
     }
   };
+  console.log("Trang UploadFile aa: ", aa);
   console.log("Trang UploadFile", imageURL);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -69,12 +78,13 @@ const UploadFile: React.FC<UploadFileProps> = ({
       throw new Error("Failed to delete file");
     }
 
-    setImageURL((prev) => {
-      const newURLs = prev.filter((item) => item.id !== id);
-      return newURLs;
-    });
+    const updatedImages = imageURL.filter((item) => item.id !== id);
+    setImageURL(updatedImages);
+
+    // Dispatch the setImages action to update the Redux state
+    dispatch(setImages(updatedImages));
   };
-  
+
   // Update the form field when imageURL changes
   useEffect(() => {
     if (prevImageURLRef.current !== imageURL) {
@@ -85,7 +95,6 @@ const UploadFile: React.FC<UploadFileProps> = ({
       );
       prevImageURLRef.current = imageURL;
     }
-    console.log("field", field.value);
   }, [imageURL, field]);
 
   return (

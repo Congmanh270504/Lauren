@@ -1,10 +1,11 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/utils/prisma";
-import { object } from "zod";
+import { array, object } from "zod";
 import { ObjectId } from "mongodb";
 import { imagesTpye } from "@/types/itemTypes";
 import { productType } from "@/types/itemTypes";
+import { pinata } from "@/utils/config";
 
 interface dataType {
   productName: string;
@@ -96,5 +97,34 @@ export async function updateProduct(
     return { ok: true, message: "Product updated successfully" };
   } catch (error) {
     return { ok: false, message: "Failed to update product" };
+  }
+}
+export async function getProductsImages(products: productType[]) {
+  if (!products || products.length === 0) {
+    return { ok: false, message: "No products found" };
+  }
+  try {
+    // Map through the products and extract the first image URL for each product
+    const images = await Promise.all(
+      products.map(async (product) => {
+        if (product.img && product.img.length > 0) {
+          const firstImage = product.img[0];
+          const url = await pinata.gateways.private.createAccessLink({
+            cid: firstImage.url || "",
+            expires: 30,
+          });
+          return url;
+        }
+        return null; // Return null if no images are available
+      })
+    );
+
+    // Filter out null values
+    const validImages = images.filter((url) => url !== null) as string[];
+
+    return { ok: true, images: validImages };
+  } catch (error) {
+    console.error("Error getting product images:", error);
+    return { ok: false, message: "Failed to get product images" };
   }
 }

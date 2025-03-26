@@ -37,7 +37,9 @@ export default function DeleteFormDialog({ id }: DeleteFormDialogProps) {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const category = useSelector((state: RootState) => state.category);
+  const category: categoryType[] = useSelector(
+    (state: RootState) => state.category
+  );
 
   useEffect(() => {
     dispatch(fetchCategory());
