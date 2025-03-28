@@ -78,7 +78,7 @@ export async function deleteCategory(categoryId: string) {
     return { ok: false, message: "Failed to delete category" };
   }
 }
-export async function updateCategory(data: Data) {
+export async function updateCategory(id: string, data: Data) {
   const { categoryName } = data;
   if (!categoryName.trim()) {
     return { ok: false, message: "Category name is required" };
@@ -94,7 +94,7 @@ export async function updateCategory(data: Data) {
     }
     const category = await prisma.categories.update({
       where: {
-        id: new ObjectId(data.categoryId).toString(),
+        id: new ObjectId(id).toString(),
       },
       data: {
         categoryName: categoryName,

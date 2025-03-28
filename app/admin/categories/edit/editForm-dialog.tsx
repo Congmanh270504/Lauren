@@ -57,7 +57,7 @@ const EditFormDialog = ({ id }: EditFormDialogProps) => {
   const cat = category.find((cat) => cat.id === id);
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      const response = await updateCategory(data);
+      const response = await updateCategory(id, data);
       if (response.ok) {
         toast.success(response.message);
         router.push("/");
@@ -66,7 +66,7 @@ const EditFormDialog = ({ id }: EditFormDialogProps) => {
         toast.error(response.message);
       }
     } catch (error) {
-      toast.error("Failed to create category");
+      toast.error("Failed to update category");
     }
   };
   return (
@@ -81,7 +81,7 @@ const EditFormDialog = ({ id }: EditFormDialogProps) => {
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Delete category</DialogTitle>
+          <DialogTitle>Edit category</DialogTitle>
           <DialogDescription>
             Make sure you want to delete category here. Click save when you're
             done.
@@ -90,19 +90,18 @@ const EditFormDialog = ({ id }: EditFormDialogProps) => {
         <div className="grid gap-4 py-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)}>
-              <div className="grid grid-cols-4 items-center gap-4">
+              <div className="grid  items-center gap-4">
                 <FormField
                   control={form.control}
                   name="categoryName"
                   render={({ field }) => (
-                    <FormItem className="w-full">
+                    <FormItem className="w-full ">
                       <FormLabel>Category Name</FormLabel> *
                       <FormControl>
                         <Input
                           placeholder="Enter category name"
                           type={"text"}
                           name="categoryName"
-                          value={field.value}
                           defaultValue={cat ? cat.categoryName : ""}
                           onChange={(e) => {
                             const val = e.target.value;

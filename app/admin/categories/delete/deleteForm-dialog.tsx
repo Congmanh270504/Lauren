@@ -27,14 +27,6 @@ interface DeleteFormDialogProps {
 }
 
 export default function DeleteFormDialog({ id }: DeleteFormDialogProps) {
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const bb = await getData();
-  //     console.log("fsadfasdfdsa", bb);
-  //   };
-  //   fetchData();
-  // }, []);
-
   const dispatch: AppDispatch = useDispatch();
 
   const category: categoryType[] = useSelector(

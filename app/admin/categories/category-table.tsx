@@ -1,6 +1,5 @@
 "use client";
-import React, { useState } from "react";
-import { Prisma } from "@prisma/client";
+import React, { useEffect, useState } from "react";
 import {
   ChevronDown,
   ChevronLeft,
@@ -9,20 +8,66 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import DeleteDialog from "./delete/deleteForm-dialog";
 import { categoryType } from "@/types/itemTypes";
 import { EditDeleteDialog } from "@/app/admin/categories/editDelete-dialog";
 import { useDispatch, useSelector } from "react-redux";
 import { handleClickOutside } from "@/app/state/modify/modifyItem";
 import { FaPlus } from "react-icons/fa6";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+} from "@/components/ui/select";
+
 interface CategoryTableProps {
   category: categoryType[];
 }
+interface RowPageProps {
+  numberItems: number;
+  page: number;
+}
 
 const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [categoriesItem, setCategoriesItem] = useState(category.slice(0, 2));
+  const [aa, setAa] = useState(0);
+  const numberItems = [2, 4, 6];
+  const [setting, setSetting] = useState<RowPageProps>({
+    numberItems: 2,
+    page: 1,
+  });
   const dispatch = useDispatch();
+  useEffect(() => {
+    console.log(setting);
+    console.log(aa);
+  }, [setting, aa]);
+  const handleChangeNumberItems = (value: string) => {
+    setSetting({ ...setting, numberItems: Number(value) });
+    setCategoriesItem(category.slice(0, Number(value)));
+  };
+
+  const handleChangePage = (value: number, type: string) => {
+    setAa(value);
+    if (type === "next") {
+      setSetting({ ...setting, page: value + 1 });
+      setCategoriesItem(
+        category.slice(
+          value * setting.numberItems,
+          (value + 1) * setting.numberItems
+        )
+      );
+    } else {
+      setSetting({ ...setting, page: value - 1 });
+      setCategoriesItem(
+        category.slice(
+          (value - 2) * setting.numberItems,
+          (value - 1) * setting.numberItems
+        )
+      );
+    }
+  };
   return (
     <div className="w-full p-4" onClick={() => dispatch(handleClickOutside())}>
       <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -57,7 +102,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {category.map((cat) => (
+              {categoriesItem.map((cat) => (
                 <tr key={cat.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center sm:table-cell">
@@ -97,32 +142,56 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
           <div className="flex items-center">
             <span className="text-sm text-gray-700">Rows per page:</span>
             <div className="ml-2 relative">
-              <button
-                type="button"
-                className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                id="rows-menu"
-                aria-expanded="true"
-                aria-haspopup="true"
-              >
-                {rowsPerPage}
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </button>
+              <Select onValueChange={handleChangeNumberItems}>
+                <SelectTrigger className="w-[70px]">
+                  <SelectValue placeholder={numberItems[0]} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {numberItems.map((row, id) => (
+                      <SelectItem value={row.toString()} key={id}>
+                        {row}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="flex items-center">
-            <span className="text-sm text-gray-700 mr-4">
-              Page {currentPage}
-            </span>
             <nav
-              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              className="relative z-0 inline-flex rounded-md  "
               aria-label="Pagination"
             >
-              <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <button
+                className="relative shadow-sm inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
+                disabled={setting.page - 1 <= 0 ? true : false}
+                style={
+                  setting.page - 1 <= 0 ? { backgroundColor: "#DBDBDB" } : {}
+                }
+                onClick={() => handleChangePage(setting.page, "prev")}
+              >
                 <span className="sr-only">Previous</span>
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
-              <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <span className="text-sm text-gray-700  content-center mx-[1rem]">
+                Page {setting.page}
+              </span>
+              <button
+                className="relative shadow-sm inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
+                onClick={() => handleChangePage(setting.page, "next")}
+                disabled={
+                  setting.page * setting.numberItems >= category.length
+                    ? true
+                    : false
+                }
+                style={
+                  setting.page * setting.numberItems >= category.length
+                    ? { backgroundColor: "#DBDBDB" }
+                    : {}
+                }
+              >
                 <span className="sr-only">Next</span>
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>
@@ -132,7 +201,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
       </div>
 
       <div className="fixed bottom-6 right-6">
-        <Link href={`/admin/category/create`}>
+        <Link href={`/admin/categories/create`}>
           <button className="relative bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg group">
             <span className="absolute left-[-125px] top-1/2 transform -translate-y-1/2 bg-gray-500 text-white text-sm rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
               Create Category

@@ -2,11 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import categoryReducer from "./categories/categories";
 import modifyItemReducer from "./modify/modifyItem";
 import productImageReducer from "./images/images";
+import rowsPerPageReducer from "./rows-per-page/rows-per-page";
 export const store = configureStore({
   reducer: {
     category: categoryReducer,
     modifyItem: modifyItemReducer,
     productImage: productImageReducer,
+    rowsPerPage: rowsPerPageReducer,
   },
 });
 

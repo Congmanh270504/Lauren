@@ -23,11 +23,10 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden scrollbar-hide`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden scrollbar-hide bg-gray-50`}
       >
         <ClientProvider>{children}</ClientProvider>
       </body>
