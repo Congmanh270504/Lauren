@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientProvider from "./ClientProvider"; // Import ClientProvider
+import SessionWrapper from "@/components/session-wrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -23,13 +24,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden scrollbar-hide bg-gray-50
-         w-full h-screen`}
-      >
-        <ClientProvider>{children}</ClientProvider>
-      </body>
-    </html>
+    <SessionWrapper>
+      <html lang="en">
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden scrollbar-hide bg-gray-50
+        w-full h-screen`}
+        >
+          <ClientProvider>{children}</ClientProvider>
+        </body>
+      </html>
+    </SessionWrapper>
   );
 }
