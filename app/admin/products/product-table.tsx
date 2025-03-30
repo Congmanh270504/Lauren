@@ -36,7 +36,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   const dispatch = useDispatch();
   return (
     <div className="w-full p-4" onClick={() => dispatch(handleClickOutside())}>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -128,7 +128,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
             <div className="ml-2 relative">
               <button
                 type="button"
-                className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-2 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-xs px-2 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 id="rows-menu"
                 aria-expanded="true"
                 aria-haspopup="true"
@@ -144,7 +144,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               Page {currentPage}
             </span>
             <nav
-              className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+              className="relative z-0 inline-flex rounded-md shadow-xs -space-x-px"
               aria-label="Pagination"
             >
               <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">

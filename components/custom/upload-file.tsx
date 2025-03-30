@@ -11,7 +11,7 @@ import { imagesTpye } from "@/types/itemTypes";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/state/store";
 import { setImages } from "@/app/state/images/images";
-import SkeletionImages from "./skeletion-images";
+import SkeletionImages from "./loading";
 
 interface UploadFileProps {
   imageURL: imagesTpye[];
@@ -127,8 +127,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
                     quality={100}
                   />
                   <Button
-                    variant="outline"
-                    className="absolute top-1 right-1 border-none rounded-full bg-[#EAEAEA] text-[#443627] px-3 py-22"
+                    className="absolute top-1 right-1 shadow-none text-red-600 border-none rounded-full bg-transparent hover:bg-white hover:border-solid"
                     onClick={() => handleClosed(img.id)}
                   >
                     X

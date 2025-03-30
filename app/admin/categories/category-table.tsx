@@ -70,7 +70,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
   };
   return (
     <div className="w-full p-4" onClick={() => dispatch(handleClickOutside())}>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
@@ -165,7 +165,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
               aria-label="Pagination"
             >
               <button
-                className="relative shadow-sm inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
+                className="relative shadow-xs inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
                 disabled={setting.page - 1 <= 0 ? true : false}
                 style={
                   setting.page - 1 <= 0 ? { backgroundColor: "#DBDBDB" } : {}
@@ -179,7 +179,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
                 Page {setting.page}
               </span>
               <button
-                className="relative shadow-sm inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
+                className="relative shadow-xs inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
                 onClick={() => handleChangePage(setting.page, "next")}
                 disabled={
                   setting.page * setting.numberItems >= category.length

@@ -71,7 +71,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
   };
 
   return (
-    <div className="mt-22">
+    <div className="w-full p-4">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
