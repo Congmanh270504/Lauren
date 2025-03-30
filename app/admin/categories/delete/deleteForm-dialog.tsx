@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect, useState } from "react";
-import Form from "@/components/own/Form";
+import Form from "@/components/custom/Form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

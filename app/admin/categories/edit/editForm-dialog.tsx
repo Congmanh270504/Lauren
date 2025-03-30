@@ -42,7 +42,6 @@ interface EditFormDialogProps {
 const EditFormDialog = ({ id }: EditFormDialogProps) => {
   const dispatch: AppDispatch = useDispatch();
   const category = useSelector((state: RootState) => state.category);
-
   useEffect(() => {
     dispatch(fetchCategory());
   }, [dispatch]);

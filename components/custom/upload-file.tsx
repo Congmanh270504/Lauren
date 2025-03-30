@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Image from "next/image";
@@ -11,6 +11,7 @@ import { imagesTpye } from "@/types/itemTypes";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/state/store";
 import { setImages } from "@/app/state/images/images";
+import SkeletionImages from "./skeletion-images";
 
 interface UploadFileProps {
   imageURL: imagesTpye[];
@@ -23,13 +24,14 @@ const UploadFile: React.FC<UploadFileProps> = ({
   setImageURL,
   field, // Add this line to accept the field object from react-hook-form
 }) => {
-  const dispatch: AppDispatch = useDispatch();
-
-  const aa = useSelector((state: RootState) => state.productImage);
-
   const prevImageURLRef = useRef<imagesTpye[]>(imageURL);
+  const [isPending, setIsPending] = useState(false);
+  useEffect(() => {
+    console.log(isPending);
+  }, [isPending]);
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    setIsPending(true);
     if (files) {
       try {
         const uploadedURLs = await Promise.all(
@@ -54,15 +56,19 @@ const UploadFile: React.FC<UploadFileProps> = ({
           setImageURL(newImageURLs);
 
           // Dispatch the setImages action to update the Redux state
-          dispatch(setImages(newImageURLs));
         }
       } catch (error) {
         console.error("Error uploading files:", error);
         toast.error("Failed to upload files. Please try again.");
       }
     }
+    setIsPending(false);
+    // if (fileInputRef.current) {
+    //   fileInputRef.current.value = "";
+
+    //   // Clear the file input after upload
+    // }
   };
-  console.log("Trang UploadFile aa: ", aa);
   console.log("Trang UploadFile", imageURL);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -82,7 +88,6 @@ const UploadFile: React.FC<UploadFileProps> = ({
     setImageURL(updatedImages);
 
     // Dispatch the setImages action to update the Redux state
-    dispatch(setImages(updatedImages));
   };
 
   // Update the form field when imageURL changes
@@ -104,30 +109,34 @@ const UploadFile: React.FC<UploadFileProps> = ({
         className="flex items-center justify-center w-full min-h-64 h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
         {imageURL.length > 0 ? (
-          <div className="grid grid-cols-3 gap-2 p-2">
-            {imageURL.map((img, i) => (
-              <div
-                className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
-                key={i}
-              >
-                <Image // if get error 500, make the user can't upload the image
-                  src={img.url || "/placeholder.svg"}
-                  alt="Uploaded image"
-                  fill
-                  className="object-cover"
-                  sizes="200px"
-                  quality={100}
-                />
-                <Button
-                  variant="outline"
-                  className="absolute top-1 right-1 border-none rounded-full bg-[#EAEAEA] text-[#443627] px-3 py-22"
-                  onClick={() => handleClosed(img.id)}
+          isPending ? (
+            <SkeletionImages />
+          ) : (
+            <div className="grid grid-cols-3 gap-2 p-2">
+              {imageURL.map((img, i) => (
+                <div
+                  className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
+                  key={i}
                 >
-                  X
-                </Button>
-              </div>
-            ))}
-          </div>
+                  <Image // if get error 500, make the user can't upload the image
+                    src={img.url || "/placeholder.svg"}
+                    alt="Uploaded image"
+                    fill
+                    className="object-cover"
+                    sizes="200px"
+                    quality={100}
+                  />
+                  <Button
+                    variant="outline"
+                    className="absolute top-1 right-1 border-none rounded-full bg-[#EAEAEA] text-[#443627] px-3 py-22"
+                    onClick={() => handleClosed(img.id)}
+                  >
+                    X
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )
         ) : (
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <svg
@@ -160,6 +169,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
           className="hidden"
           name="productsImages"
           ref={fileInputRef}
+          disabled={isPending}
           onChange={handleFileChange}
         />
       </Label>

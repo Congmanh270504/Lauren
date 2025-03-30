@@ -15,7 +15,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import UploadFile from "@/components/own/upload-file";
+import UploadFile from "@/components/custom/upload-file";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { updateProduct } from "@/app/action/products";
