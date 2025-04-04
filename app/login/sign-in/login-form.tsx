@@ -24,6 +24,7 @@ import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
 import { TypographyH4 } from "@/components/ui/typography";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -38,7 +39,7 @@ export default function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
   const [showPassword, setShowPassword] = useState(false);
-
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,12 +50,16 @@ export default function LoginForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      const res = await signIn("credentials", {
+        ...values,
+        redirect: false,
+      });
+      if (res) {
+        toast.success("Login successful!");
+        router.push("/");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
@@ -179,7 +184,10 @@ export default function LoginForm({
         </div>
         <div className="text-center text-base mt-2">
           Don&apos;t have an account?{" "}
-          <Link href="/login/register" className="underline underline-offset-4 font-medium">
+          <Link
+            href="/login/register"
+            className="underline underline-offset-4 font-medium"
+          >
             Sign up
           </Link>
         </div>

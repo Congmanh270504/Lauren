@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ClientProvider from "./ClientProvider"; // Import ClientProvider
 import SessionWrapper from "@/components/session-wrapper";
-
+import { ThemeProvider } from "@/components/theme-provider";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,12 +25,19 @@ export default function RootLayout({
 }>) {
   return (
     <SessionWrapper>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden scrollbar-hide bg-gray-50
         w-full h-screen`}
         >
-          <ClientProvider>{children}</ClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <ClientProvider>{children}</ClientProvider>
+          </ThemeProvider>
         </body>
       </html>
     </SessionWrapper>

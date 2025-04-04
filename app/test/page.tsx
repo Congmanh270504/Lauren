@@ -7,37 +7,27 @@ import { AppDispatch, RootState } from "../state/store";
 import SkeletionImages from "@/components/custom/loading";
 import { signIn, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
+import SplitText from "@/components/ui/blocks/TextAnimations/SplitText/SplitText";
+import TrueFocus from "@/components/ui/text-animations/TrueFocus/TrueFocus";
+
+const handleAnimationComplete = () => {
+  console.log("All letters have animated!");
+};
+
 const page = () => {
   const { data: session } = useSession();
   console.log(session, "session");
   return (
-    <>
-      <div>
-        <Button
-          onClick={() => {
-            signIn("github");
-          }}
-        >
-          login{" "}
-        </Button>
-      </div>
-      {session ? (
-        <div>
-          {session.user?.name}
-          {
-            <Image
-              src={session.user?.image!}
-              alt="user"
-              width={50}
-              height={50}
-            />
-          }
-        </div>
-      ) : (
-        <div>bbbb</div>
-      )}
-      : <div>bbbb</div>
-    </>
+    <div >
+      <TrueFocus
+        sentence="True Focus"
+        manualMode={false}
+        blurAmount={5}
+        borderColor="red"
+        animationDuration={2}
+        pauseBetweenAnimations={1}
+      />
+    </div>
   );
 };
 

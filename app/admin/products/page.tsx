@@ -19,7 +19,6 @@ const page = async () => {
   const productImages = await getProductsImages(products);
   return (
     <div>
-      <h1>Product</h1>
       <ProductTable products={products} productImages={productImages} />
     </div>
   );

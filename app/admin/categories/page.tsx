@@ -11,7 +11,6 @@ const page = async () => {
   const category = await getData();
   return (
     <div className="w-full ">
-      <h1>Category</h1>
       <CategoryTable category={category} />
     </div>
   );

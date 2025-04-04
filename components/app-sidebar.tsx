@@ -11,7 +11,8 @@ import {
   Map,
   PieChart,
   Settings2,
-  SquareTerminal,
+  Store,
+  Apple,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
@@ -26,6 +27,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+
 // This is sample data.
 const data = {
   user: {
@@ -52,40 +57,40 @@ const data = {
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
+      title: "Categories",
+      url: "/admin/categories",
+      icon: Store,
       isActive: true,
       items: [
         {
-          title: "Product",
-          url: "/admin/product",
+          title: "Table",
+          url: "/admin/categories",
         },
         {
-          title: "Delete",
-          url: "/admin/product/delete",
+          title: "Create",
+          url: "/admin/categories/create",
         },
         {
-          title: "Edit",
-          url: "/admin/product/edit",
+          title: "Create Many",
+          url: "#",
         },
       ],
     },
     {
-      title: "Models",
+      title: "Products",
       url: "#",
-      icon: Bot,
+      icon: Apple,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Table",
+          url: "/admin/products",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Create",
+          url: "/admin/products/create",
         },
         {
-          title: "Quantum",
+          title: "Create Many",
           url: "#",
         },
       ],
@@ -157,6 +162,9 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { setTheme } = useTheme();
+
+  const [isLight, setIsLight] = React.useState(true);
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -167,6 +175,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
+        <div className="flex items-center space-x-2">
+          <Switch
+            id="theme-mode"
+            onClick={() => {
+              if (isLight) {
+                setTheme("dark");
+              } else {
+                setTheme("light");
+              }
+              setIsLight(!isLight);
+            }}
+          />
+          <Label htmlFor="theme-mode">Airplane Mode</Label>
+        </div>
         <NavUser />
       </SidebarFooter>
       <SidebarRail />

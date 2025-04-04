@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const formSchema = z
   .object({
@@ -55,6 +56,7 @@ export default function LoginRegister({
       confirmPassword: "",
     },
   });
+  const router = useRouter();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
@@ -62,12 +64,22 @@ export default function LoginRegister({
         method: "POST",
         body: JSON.stringify(values),
       });
+      console.log(response);
       const data = await response.json();
+      console.log(data);
+
+      if (response.status === 400) {
+        toast.error(data.error);
+        return;
+      }
+
       if (data.error) {
         toast.error("Failed to create account. Please try again.");
+        return;
       }
-      toast.success("Account created successfully!");
-      form.reset(); // Reset the form after successful submission
+      toast.success(data.success);
+      router.push("/login/sign-in");
+      form.reset();
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
@@ -85,9 +97,9 @@ export default function LoginRegister({
         {...props}
       >
         <div className="flex flex-col items-center gap-3 text-center">
-          <h1 className="text-3xl font-bold">Login to your account</h1>
+          <h1 className="text-3xl font-bold">Register your account</h1>
           <p className="text-balance text-base text-muted-foreground">
-            Enter your email below to login to your account
+            Enter your details below to create a new account
           </p>
         </div>
         <div className="grid gap-6">
@@ -123,8 +135,6 @@ export default function LoginRegister({
               </FormItem>
             )}
           />
-
-          {/* Phone Field */}
           <FormField
             control={form.control}
             name="phone"
@@ -132,14 +142,12 @@ export default function LoginRegister({
               <FormItem className="grid gap-2">
                 <FormLabel htmlFor="phone">Phone Number</FormLabel>
                 <FormControl>
-                  <PhoneInput {...field} defaultCountry="TR" />
+                  <PhoneInput {...field} defaultCountry="VN" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          {/* Password Field */}
           <FormField
             control={form.control}
             name="password"
@@ -158,8 +166,6 @@ export default function LoginRegister({
               </FormItem>
             )}
           />
-
-          {/* Confirm Password Field */}
           <FormField
             control={form.control}
             name="confirmPassword"
@@ -190,7 +196,7 @@ export default function LoginRegister({
         <div className="text-center text-base mt-2">
           Already have an account?{" "}
           <Link
-            href="/login/register"
+            href="/login/sign-in"
             className="underline underline-offset-4 font-medium"
           >
             Login
