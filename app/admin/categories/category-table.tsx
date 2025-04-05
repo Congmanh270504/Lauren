@@ -32,24 +32,19 @@ interface RowPageProps {
 
 const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
   const [categoriesItem, setCategoriesItem] = useState(category.slice(0, 2));
-  const [aa, setAa] = useState(0);
-  const numberItems = [2, 4, 6];
+  const numberItems = [2, 4, 6, 8, 10];
   const [setting, setSetting] = useState<RowPageProps>({
     numberItems: 2,
     page: 1,
   });
   const dispatch = useDispatch();
-  useEffect(() => {
-    console.log(setting);
-    console.log(aa);
-  }, [setting, aa]);
+
   const handleChangeNumberItems = (value: string) => {
     setSetting({ ...setting, numberItems: Number(value) });
     setCategoriesItem(category.slice(0, Number(value)));
   };
 
   const handleChangePage = (value: number, type: string) => {
-    setAa(value);
     if (type === "next") {
       setSetting({ ...setting, page: value + 1 });
       setCategoriesItem(
@@ -107,7 +102,19 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center sm:table-cell">
                       {cat.categoryName ? (
-                        <span className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl">
+                        <span
+                          className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl"
+                          style={{
+                            color: `#${(
+                              parseInt(
+                                cat.categoryName.charCodeAt(0).toString(),
+                                10
+                              ) * 123456
+                            )
+                              .toString(16)
+                              .slice(0, 6)}`,
+                          }}
+                        >
                           {cat.categoryName.charAt(0)}
                         </span>
                       ) : (
@@ -157,6 +164,12 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
                 </SelectContent>
               </Select>
             </div>
+            <Link href={`/admin/categories/create`}>
+              <Button className="ml-2" variant="destructive">
+                Create Category
+                <FaPlus className="ml-2" size={16} />
+              </Button>
+            </Link>
           </div>
 
           <div className="flex items-center">
@@ -198,17 +211,6 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
             </nav>
           </div>
         </div>
-      </div>
-
-      <div className="fixed bottom-6 right-6">
-        <Link href={`/admin/categories/create`}>
-          <button className="relative bg-blue-500 hover:bg-blue-600 text-white rounded-full p-4 shadow-lg group">
-            <span className="absolute left-[-125px] top-1/2 transform -translate-y-1/2 bg-gray-500 text-white text-sm rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              Create Category
-            </span>
-            <FaPlus />
-          </button>
-        </Link>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -19,17 +19,21 @@ import { useRouter } from "next/navigation";
 import { formSchema } from "../form-schema";
 import { createCategory } from "@/app/action/category";
 import { serverAction } from "./server-action";
-
+import { Loader2 } from "lucide-react";
+import { getRandomColor } from "@/app/action/helper";
 const page = () => {
   const router = useRouter();
+
+  const [isPending, setIsPending] = useState(false);
+
+  const [randomColor, setRadomColort] = useState<string>("");
+  useEffect(() => {
+    setRadomColort(getRandomColor());
+  }, []);
   const initialState = {
     success: false,
     message: "",
   };
-  const [state, action, isPending] = React.useActionState(
-    serverAction,
-    initialState
-  );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,6 +42,7 @@ const page = () => {
   });
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsPending(!isPending);
       const response = await createCategory(data);
       if (response.ok) {
         toast.success(response.message);
@@ -46,10 +51,16 @@ const page = () => {
       } else {
         toast.error(response.message);
       }
+      setIsPending(false);
     } catch (error) {
       toast.error("Failed to create category");
+      setIsPending(false);
     }
   };
+  // const [data, action, isPending] = React.useActionState(
+  //   handleSubmit,
+  //   initialState
+  // );
   return (
     <div>
       <Form {...form}>
@@ -57,14 +68,21 @@ const page = () => {
           onSubmit={form.handleSubmit(handleSubmit)}
           className="flex flex-col p-2 md:p-5 w-full mx-auto rounded-md max-w-3xl gap-2 border"
         >
-          <h2 className="text-2xl font-bold">Contact us</h2>
-          <p className="text-base">Please fill the form below to contact us</p>
+          <h2 className={"text-2xl font-bold "} style={{ color: randomColor }}>
+            Create category
+          </h2>
+          <p className="text-base">
+            Please fill the form below to create category make sure no empty
+            fill
+          </p>
           <FormField
             control={form.control}
             name="categoryName"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Category Name</FormLabel> *
+                <FormLabel>
+                  Category Name <span className="text-red-600">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input
                     placeholder="Enter category name"
@@ -85,9 +103,22 @@ const page = () => {
             <Button className="rounded-lg" size="sm" variant="destructive">
               Cancel
             </Button>
-            <Button className="rounded-lg" size="sm" type="submit">
-              {isPending ? "Submitting..." : "Submit"}
-            </Button>
+
+            {isPending ? (
+              <Button disabled>
+                <Loader2 className="animate-spin" />
+                Please wait
+              </Button>
+            ) : (
+              <Button
+                className="rounded-lg "
+                size="sm"
+                type="submit"
+                variant="submit"
+              >
+                Submit
+              </Button>
+            )}
           </div>
         </form>
       </Form>

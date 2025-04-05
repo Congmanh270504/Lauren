@@ -8,9 +8,6 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { pinata } from "@/utils/config";
 import { imagesTpye } from "@/types/itemTypes";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/app/state/store";
-import { setImages } from "@/app/state/images/images";
 import SkeletionImages from "./loading";
 
 interface UploadFileProps {
@@ -26,11 +23,28 @@ const UploadFile: React.FC<UploadFileProps> = ({
 }) => {
   const prevImageURLRef = useRef<imagesTpye[]>(imageURL);
   const [isPending, setIsPending] = useState(false);
-  useEffect(() => {
-    console.log(isPending);
-  }, [isPending]);
+  const dropZoneConfig = {
+    accept: ["jpg", "jpeg", "png"],
+    maxSize: 1024 * 1024 * 10,
+  };
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    if (!files || files.length === 0) {
+      toast.error("No file selected. Please upload a valid image file.");
+      return;
+    }
+    const file = files.item(0);
+    console.log("files", file?.type.split("/").pop(), file?.size);
+    // Validate file type
+    if (!dropZoneConfig.accept.includes(file?.type.split("/", 2).pop() ?? "")) {
+      toast.error("File type not supported. Please upload a valid image file.");
+      return;
+    }
+
+    if ((files?.item(0)?.size ?? 0) > dropZoneConfig.maxSize) {
+      toast.error("Size image is to big. Please upload a valid image file.");
+      return;
+    }
     setIsPending(true);
     if (files) {
       try {
@@ -63,13 +77,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
       }
     }
     setIsPending(false);
-    // if (fileInputRef.current) {
-    //   fileInputRef.current.value = "";
-
-    //   // Clear the file input after upload
-    // }
   };
-  console.log("Trang UploadFile", imageURL);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -158,7 +166,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
               drop //{" "}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              SVG, PNG, JPG or GIF (MAX. 800x400px)
+              PNG, JPG or JPEG(MAX. 10MB)
             </p>
           </div>
         )}

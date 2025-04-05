@@ -175,19 +175,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 ml-[7px]">
           <Switch
             id="theme-mode"
             onClick={() => {
-              if (isLight) {
-                setTheme("dark");
-              } else {
-                setTheme("light");
-              }
+              isLight ? setTheme("dark") : setTheme("light");
               setIsLight(!isLight);
             }}
           />
-          <Label htmlFor="theme-mode">Airplane Mode</Label>
+          <Label htmlFor="theme-mode">{isLight ? "Dark" : "Light"} Mode</Label>
         </div>
         <NavUser />
       </SidebarFooter>

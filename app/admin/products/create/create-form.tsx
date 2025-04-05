@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as z from "zod";
 import { formSchema } from "../form-schema";
 import { serverAction } from "./server-action";
@@ -30,11 +30,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categoryType, imagesTpye } from "@/types/itemTypes";
+import { getRandomColor } from "@/app/action/helper";
 const CreateForm = ({ categories }: { categories: categoryType[] }) => {
   const [imageURL, setImageURL] = useState<imagesTpye[]>([]);
-
   const router = useRouter();
-
+  const [randomColor, setRadomColort] = useState<string>("");
+  useEffect(() => {
+    setRadomColort(getRandomColor());
+  }, []);
   const initialState = {
     success: false,
     message: "",
@@ -52,8 +55,6 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
     serverAction,
     initialState
   );
-
-  console.log("Trang page", imageURL);
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -77,8 +78,13 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
           onSubmit={form.handleSubmit(handleSubmit)}
           className="flex flex-col p-2 md:p-5 w-full mx-auto rounded-md max-w-3xl gap-2 border"
         >
-          <h2 className="text-2xl font-bold">Create product</h2>
-          <p className="text-base">Please fill the form below to contact us</p>
+          <h2 className={"text-2xl font-bold"} style={{ color: randomColor }}>
+            Create product
+          </h2>
+
+          <p className="text-base">
+            Please fill the form below to create product
+          </p>
 
           <div className="flex items-center justify-between flex-wrap sm:flex-nowrap w-full gap-2">
             <FormField
@@ -86,7 +92,9 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
               name="productName"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Product name</FormLabel> *
+                  <FormLabel>
+                    Product name <span className="text-red-600">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter your name"
@@ -108,7 +116,9 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
               name="price"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Price</FormLabel> *
+                  <FormLabel>
+                    Price <span className="text-red-600">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter product price"
@@ -131,7 +141,9 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
             name="categoryId"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Category</FormLabel> *
+                <FormLabel>
+                  Category <span className="text-red-600">*</span>
+                </FormLabel>
                 <FormControl>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger className="w-full">
@@ -157,7 +169,9 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
             name="productsImages" // bug here
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Upload file image</FormLabel> *
+                <FormLabel>
+                  Upload file image <span className="text-red-600">*</span>
+                </FormLabel>
                 <FormControl>
                   <UploadFile
                     imageURL={imageURL}
@@ -173,7 +187,12 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
             <Button className="rounded-lg" size="sm" variant="destructive">
               Cancel
             </Button>
-            <Button className="rounded-lg" size="sm" type="submit">
+            <Button
+              className="rounded-lg"
+              size="sm"
+              type="submit"
+              variant="submit"
+            >
               {isPending ? "Submitting..." : "Submit"}
             </Button>
           </div>

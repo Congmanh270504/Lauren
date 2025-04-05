@@ -10,7 +10,7 @@ async function getData() {
 const page = async () => {
   const category = await getData();
   return (
-    <div className="w-full ">
+    <div className="w-full overflow-y-scoll no-scollbar">
       <CategoryTable category={category} />
     </div>
   );

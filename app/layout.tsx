@@ -27,7 +27,7 @@ export default function RootLayout({
     <SessionWrapper>
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden scrollbar-hide bg-gray-50
+          className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-auto no-scrollbar bg-gray-50
         w-full h-screen`}
         >
           <ThemeProvider
