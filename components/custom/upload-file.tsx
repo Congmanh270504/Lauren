@@ -6,7 +6,6 @@ import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { pinata } from "@/utils/config";
 import { imagesTpye } from "@/types/itemTypes";
 import SkeletionImages from "./loading";
 
@@ -116,34 +115,32 @@ const UploadFile: React.FC<UploadFileProps> = ({
         htmlFor="productsImages"
         className="flex items-center justify-center w-full min-h-64 h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
-        {imageURL.length > 0 ? (
-          isPending ? (
-            <SkeletionImages />
-          ) : (
-            <div className="grid grid-cols-3 gap-2 p-2">
-              {imageURL.map((img, i) => (
-                <div
-                  className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
-                  key={i}
+        {isPending ? (
+          <SkeletionImages />
+        ) : imageURL.length > 0 ? (
+          <div className="grid grid-cols-3 gap-2 p-2">
+            {imageURL.map((img, i) => (
+              <div
+                className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
+                key={i}
+              >
+                <Image // if get error 500, make the user can't upload the image
+                  src={img.url || "/placeholder.svg"}
+                  alt="Uploaded image"
+                  fill
+                  className="object-cover"
+                  sizes="200px"
+                  quality={100}
+                />
+                <Button
+                  className="absolute top-1 right-1 shadow-none text-red-600 border-none rounded-full bg-transparent hover:bg-white hover:border-solid"
+                  onClick={() => handleClosed(img.id)}
                 >
-                  <Image // if get error 500, make the user can't upload the image
-                    src={img.url || "/placeholder.svg"}
-                    alt="Uploaded image"
-                    fill
-                    className="object-cover"
-                    sizes="200px"
-                    quality={100}
-                  />
-                  <Button
-                    className="absolute top-1 right-1 shadow-none text-red-600 border-none rounded-full bg-transparent hover:bg-white hover:border-solid"
-                    onClick={() => handleClosed(img.id)}
-                  >
-                    X
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )
+                  X
+                </Button>
+              </div>
+            ))}
+          </div>
         ) : (
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <svg
