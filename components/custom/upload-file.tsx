@@ -70,10 +70,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ files, setFiles, field }) => {
         className: "flex items-center justify-center w-full",
       })}
     >
-      <Label
-        htmlFor="productsImages"
-        className="flex items-center justify-center w-full min-h-64 h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
-      >
+      <div className="flex items-center justify-center w-full min-h-64 h-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
         {isDragActive ? (
           <p>Drop the files here ...</p>
         ) : (
@@ -110,14 +107,14 @@ const UploadFile: React.FC<UploadFileProps> = ({ files, setFiles, field }) => {
             )}
           </div>
         )}
-        <Input
-          {...getInputProps()}
-          id="productsImages"
-          name="productsImages"
-          type="file"
-          className="hidden"
-        />
-      </Label>
+      </div>
+      <Input
+        {...getInputProps()}
+        id="productsImages"
+        name="productsImages"
+        type="file"
+        className="hidden"
+      />
     </div>
   );
 };
