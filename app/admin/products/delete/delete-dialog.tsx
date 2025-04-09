@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback } from "react";
-import Form from "@/components/custom/Form";
+import Form from "@/components/custom/form";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

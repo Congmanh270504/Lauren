@@ -6,13 +6,11 @@ import {
   ChevronRight,
   MoreVertical,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { categoryType } from "@/types/itemTypes";
+import { categoryType, productType } from "@/types/itemTypes";
 import { EditDeleteDialog } from "@/app/admin/categories/editDelete-dialog";
 import { useDispatch, useSelector } from "react-redux";
 import { handleClickOutside } from "@/app/state/modify/modifyItem";
-import { FaPlus } from "react-icons/fa6";
 import {
   Select,
   SelectContent,
@@ -21,6 +19,7 @@ import {
   SelectValue,
   SelectGroup,
 } from "@/components/ui/select";
+import RowPageFilter from "@/components/custom/row-page-filter";
 
 interface CategoryTableProps {
   category: categoryType[];
@@ -33,36 +32,9 @@ interface RowPageProps {
 const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
   const [categoriesItem, setCategoriesItem] = useState(category.slice(0, 2));
   const numberItems = [2, 4, 6, 8, 10];
-  const [setting, setSetting] = useState<RowPageProps>({
-    numberItems: 2,
-    page: 1,
-  });
+
   const dispatch = useDispatch();
 
-  const handleChangeNumberItems = (value: string) => {
-    setSetting({ ...setting, numberItems: Number(value) });
-    setCategoriesItem(category.slice(0, Number(value)));
-  };
-
-  const handleChangePage = (value: number, type: string) => {
-    if (type === "next") {
-      setSetting({ ...setting, page: value + 1 });
-      setCategoriesItem(
-        category.slice(
-          value * setting.numberItems,
-          (value + 1) * setting.numberItems
-        )
-      );
-    } else {
-      setSetting({ ...setting, page: value - 1 });
-      setCategoriesItem(
-        category.slice(
-          (value - 2) * setting.numberItems,
-          (value - 1) * setting.numberItems
-        )
-      );
-    }
-  };
   return (
     <div className="w-full p-4" onClick={() => dispatch(handleClickOutside())}>
       <div className="bg-white rounded-lg shadow-sm overflow-hidden">
@@ -144,8 +116,16 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
             </tbody>
           </table>
         </div>
-
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+        <RowPageFilter
+          data={category}
+          numberItems={numberItems}
+          setItem={
+            setCategoriesItem as React.Dispatch<
+              React.SetStateAction<productType[] | categoryType[]>
+            >
+          }
+        />
+        {/* <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
           <div className="flex items-center">
             <span className="text-sm text-gray-700">Rows per page:</span>
             <div className="ml-2 relative">
@@ -210,7 +190,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
               </button>
             </nav>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

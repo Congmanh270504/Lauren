@@ -19,6 +19,15 @@ import { FaPlus } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import EditDeleteDialog from "./editDelete-dialog";
 import Image from "next/image";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SelectGroup,
+} from "@/components/ui/select";
+import CheckboxIconCustom from "@/components/custom/checkbox-icon";
 type ProductWithImages = Prisma.ProductsGetPayload<{
   include: { img: true; Category: true };
 }>;
@@ -27,12 +36,49 @@ interface ProductTableProps {
   products: ProductWithImages[];
   productImages: string[];
 }
+interface RowPageProps {
+  numberItems: number;
+  page: number;
+}
 const ProductTable: React.FC<ProductTableProps> = ({
   products,
   productImages,
 }) => {
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const numberItems = [5, 10, 15, 20, 30];
+  const [setting, setSetting] = useState<RowPageProps>({
+    numberItems: 2,
+    page: 1,
+  });
+  const [productItem, setProductItem] = useState(products.slice(0, 5));
+  const [deleteAllFiles, setDeleteAllFiles] = useState(false);
+
+  const handleDeleteAllFiles = () => {
+    setDeleteAllFiles(!deleteAllFiles);
+  };
+  const handleChangeNumberItems = (value: string) => {
+    setSetting({ ...setting, numberItems: Number(value) });
+    setProductItem(products.slice(0, Number(value)));
+  };
+
+  const handleChangePage = (value: number, type: string) => {
+    if (type === "next") {
+      setSetting({ ...setting, page: value + 1 });
+      setProductItem(
+        products.slice(
+          value * setting.numberItems,
+          (value + 1) * setting.numberItems
+        )
+      );
+    } else {
+      setSetting({ ...setting, page: value - 1 });
+      setProductItem(
+        products.slice(
+          (value - 2) * setting.numberItems,
+          (value - 1) * setting.numberItems
+        )
+      );
+    }
+  };
   const dispatch = useDispatch();
   return (
     <div className="w-full p-4" onClick={() => dispatch(handleClickOutside())}>
@@ -42,7 +88,23 @@ const ProductTable: React.FC<ProductTableProps> = ({
             <thead className="bg-gray-50">
               <tr>
                 <th scope="col" className="px-4 py-3 text-left">
-                  <div className="flex items-center">Image</div>
+                  <div className="flex items-center">
+                    {/* <Button
+                      variant="ghost"
+                      className="hover:bg-gray-50"
+                      onClick={() => setDeleteAllFiles(!deleteAllFiles)}
+                    >
+                      {deleteAllFiles ? <IoIosCheckbox /> : <FaRegSquare />}
+                    </Button> */}
+                    {/* <CheckboxIconProp checked={false} /> */}
+                    <CheckboxIconCustom checked={deleteAllFiles} />
+                  </div>
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Image
                 </th>
                 <th
                   scope="col"
@@ -74,8 +136,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {products.map((pro) => (
+              {productItem.map((pro) => (
                 <tr key={pro.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <CheckboxIconCustom checked={false} />
+                  </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center sm:table-cell">
                       <span className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl">
@@ -126,32 +191,56 @@ const ProductTable: React.FC<ProductTableProps> = ({
           <div className="flex items-center">
             <span className="text-sm text-gray-700">Rows per page:</span>
             <div className="ml-2 relative">
-              <button
-                type="button"
-                className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-xs px-2 py-1 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                id="rows-menu"
-                aria-expanded="true"
-                aria-haspopup="true"
-              >
-                {rowsPerPage}
-                <ChevronDown className="ml-1 h-4 w-4" />
-              </button>
+              <Select onValueChange={handleChangeNumberItems}>
+                <SelectTrigger className="w-[70px]">
+                  <SelectValue placeholder={numberItems[0]} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {numberItems.map((row, id) => (
+                      <SelectItem value={row.toString()} key={id}>
+                        {row}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
           <div className="flex items-center">
-            <span className="text-sm text-gray-700 mr-4">
-              Page {currentPage}
-            </span>
             <nav
-              className="relative z-0 inline-flex rounded-md shadow-xs -space-x-px"
+              className="relative z-0 inline-flex rounded-md  "
               aria-label="Pagination"
             >
-              <button className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <button
+                className="relative shadow-xs inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
+                disabled={setting.page - 1 <= 0 ? true : false}
+                style={
+                  setting.page - 1 <= 0 ? { backgroundColor: "#DBDBDB" } : {}
+                }
+                onClick={() => handleChangePage(setting.page, "prev")}
+              >
                 <span className="sr-only">Previous</span>
                 <ChevronLeft className="h-5 w-5" aria-hidden="true" />
               </button>
-              <button className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+              <span className="text-sm text-gray-700  content-center mx-[1rem]">
+                Page {setting.page}
+              </span>
+              <button
+                className="relative shadow-xs inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
+                onClick={() => handleChangePage(setting.page, "next")}
+                disabled={
+                  setting.page * setting.numberItems >= products.length
+                    ? true
+                    : false
+                }
+                style={
+                  setting.page * setting.numberItems >= products.length
+                    ? { backgroundColor: "#DBDBDB" }
+                    : {}
+                }
+              >
                 <span className="sr-only">Next</span>
                 <ChevronRight className="h-5 w-5" aria-hidden="true" />
               </button>

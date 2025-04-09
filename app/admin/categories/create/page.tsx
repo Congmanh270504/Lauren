@@ -57,10 +57,6 @@ const page = () => {
       setIsPending(false);
     }
   };
-  // const [data, action, isPending] = React.useActionState(
-  //   handleSubmit,
-  //   initialState
-  // );
   return (
     <div>
       <Form {...form}>
