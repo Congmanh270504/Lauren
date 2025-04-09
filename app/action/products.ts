@@ -24,13 +24,12 @@ export async function createProduct(data: dataType) {
         price: data.price,
         categoryId: data.categoryId, // updated
         img: {
-          create: data.productsImages.map((img) => ({
-            url: img,
+          create: data.productsImages.map((cid) => ({
+            url: cid,
           })),
         },
       },
     });
-    revalidatePath("/");
     return { ok: true, message: "Product created successfully" };
   } catch (error) {
     console.error("Error creating product:", error);

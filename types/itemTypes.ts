@@ -18,7 +18,6 @@ export type imagesTpye = {
   id: string;
   productId: string;
   url: string;
-  cid?: string;
   createdAt?: Date;
   updatedAt?: Date;
 };

@@ -32,9 +32,10 @@ import {
 import { categoryType, imagesTpye } from "@/types/itemTypes";
 import { getRandomColor } from "@/app/action/helper";
 const CreateForm = ({ categories }: { categories: categoryType[] }) => {
-  const [imageURL, setImageURL] = useState<imagesTpye[]>([]);
+  const [files, setFiles] = useState<Array<{ file: File }>>([]);
   const router = useRouter();
   const [randomColor, setRadomColort] = useState<string>("");
+  //const [cid, setCid] = useState<Array<string>>([]);
   useEffect(() => {
     setRadomColort(getRandomColor());
   }, []);
@@ -70,6 +71,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
       toast.error("Đã xảy ra lỗi khi thêm sản phẩm. Vui lòng thử lại.");
     }
   };
+  console.log("form", form.getValues("productsImages"));
 
   return (
     <div className="w-full p-4">
@@ -174,8 +176,10 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
                 </FormLabel>
                 <FormControl>
                   <UploadFile
-                    imageURL={imageURL}
-                    setImageURL={setImageURL}
+                    files={files}
+                    setFiles={setFiles}
+                    //cid={cid}
+                    //setCid={setCid}
                     field={field} // Pass the field object to the UploadFile component
                   />
                 </FormControl>

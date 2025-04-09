@@ -128,7 +128,7 @@ const EditForm = ({ product }: { product: productType }) => {
                 <FormLabel>Upload file image</FormLabel> *
                 <FormControl>
                   <UploadFile
-                    imageURL={imageURL}
+                    files={imageURL}
                     setImageURL={setImageURL}
                     field={field}
                   />
