@@ -40,7 +40,7 @@ export default function EditDeleteDialog({
       </button>
       {activeDropdown === products.id && (
         <div
-          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
+          className="absolute right-10 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-10"
           onClick={(e) => e.stopPropagation()}
         >
           <div

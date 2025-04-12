@@ -19,6 +19,8 @@ import { FaPlus } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import EditDeleteDialog from "./editDelete-dialog";
 import Image from "next/image";
+import { Check } from "lucide-react";
+
 import {
   Select,
   SelectContent,
@@ -28,6 +30,11 @@ import {
   SelectGroup,
 } from "@/components/ui/select";
 import CheckboxIconCustom from "@/components/custom/checkbox-icon";
+import RowPageFilter from "@/components/custom/row-page-filter";
+import { categoryType, productType } from "@/types/itemTypes";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2 } from "lucide-react";
+
 type ProductWithImages = Prisma.ProductsGetPayload<{
   include: { img: true; Category: true };
 }>;
@@ -36,49 +43,16 @@ interface ProductTableProps {
   products: ProductWithImages[];
   productImages: string[];
 }
-interface RowPageProps {
-  numberItems: number;
-  page: number;
-}
 const ProductTable: React.FC<ProductTableProps> = ({
   products,
   productImages,
 }) => {
   const numberItems = [5, 10, 15, 20, 30];
-  const [setting, setSetting] = useState<RowPageProps>({
-    numberItems: 2,
-    page: 1,
-  });
   const [productItem, setProductItem] = useState(products.slice(0, 5));
   const [deleteAllFiles, setDeleteAllFiles] = useState(false);
+  const [deleteFilesId, setDeleteFilesId] = useState<string[]>([]);
+  const size = 24;
 
-  const handleDeleteAllFiles = () => {
-    setDeleteAllFiles(!deleteAllFiles);
-  };
-  const handleChangeNumberItems = (value: string) => {
-    setSetting({ ...setting, numberItems: Number(value) });
-    setProductItem(products.slice(0, Number(value)));
-  };
-
-  const handleChangePage = (value: number, type: string) => {
-    if (type === "next") {
-      setSetting({ ...setting, page: value + 1 });
-      setProductItem(
-        products.slice(
-          value * setting.numberItems,
-          (value + 1) * setting.numberItems
-        )
-      );
-    } else {
-      setSetting({ ...setting, page: value - 1 });
-      setProductItem(
-        products.slice(
-          (value - 2) * setting.numberItems,
-          (value - 1) * setting.numberItems
-        )
-      );
-    }
-  };
   const dispatch = useDispatch();
   return (
     <div className="w-full p-4" onClick={() => dispatch(handleClickOutside())}>
@@ -89,15 +63,25 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <tr>
                 <th scope="col" className="px-4 py-3 text-left">
                   <div className="flex items-center">
-                    {/* <Button
-                      variant="ghost"
-                      className="hover:bg-gray-50"
-                      onClick={() => setDeleteAllFiles(!deleteAllFiles)}
+                    <div
+                      className={"relative cursor-pointer "}
+                      style={{ width: size, height: size }}
+                      onClick={() => {
+                        setDeleteAllFiles(!deleteAllFiles);
+                        console.log(deleteAllFiles);
+                      }}
+                      role="checkbox"
+                      aria-checked={deleteAllFiles}
+                      tabIndex={0}
                     >
-                      {deleteAllFiles ? <IoIosCheckbox /> : <FaRegSquare />}
-                    </Button> */}
-                    {/* <CheckboxIconProp checked={false} /> */}
-                    <CheckboxIconCustom checked={deleteAllFiles} />
+                      {deleteAllFiles ? (
+                        <div className="flex items-center justify-center w-full h-full rounded-md bg-violet-500 text-white">
+                          <Check size={size * 0.6} strokeWidth={3} />
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center w-full h-full rounded-md border-2 border-slate-300"></div>
+                      )}
+                    </div>
                   </div>
                 </th>
                 <th
@@ -130,8 +114,16 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 >
                   Update at
                 </th>
-                <th scope="col" className="relative px-4 py-3">
-                  <span className="sr-only">Actions</span>
+                <th scope="col" className="relative px-4 py-3 text-right">
+                  {deleteAllFiles ? (
+                    // <Button className="ml-2" variant="destructive">
+                    //   DELETE
+                    //   <Trash2 />
+                    // </Button>
+                    "âfa"
+                  ) : (
+                    <span className="sr-only">Actions</span>
+                  )}
                 </th>
               </tr>
             </thead>
@@ -139,7 +131,21 @@ const ProductTable: React.FC<ProductTableProps> = ({
               {productItem.map((pro) => (
                 <tr key={pro.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
-                    <CheckboxIconCustom checked={false} />
+                    {deleteAllFiles ? (
+                      <CheckboxIconCustom
+                        checked={deleteAllFiles}
+                        onChange={(newState) => {
+                          setDeleteAllFiles(newState); // Update the state
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className="relative cursor-pointer"
+                        style={{ width: size, height: size }}
+                      >
+                        <Checkbox className="flex items-center justify-center w-full h-full rounded-md border-2 border-slate-300" />
+                      </div>
+                    )}
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     <div className="flex items-center sm:table-cell">
@@ -179,7 +185,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
                   <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                     <EditDeleteDialog products={pro} />
-                    {/* <MoreVertical className="h-5 w-5" /> */}
                   </td>
                 </tr>
               ))}
@@ -187,66 +192,15 @@ const ProductTable: React.FC<ProductTableProps> = ({
           </table>
         </div>
 
-        <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-          <div className="flex items-center">
-            <span className="text-sm text-gray-700">Rows per page:</span>
-            <div className="ml-2 relative">
-              <Select onValueChange={handleChangeNumberItems}>
-                <SelectTrigger className="w-[70px]">
-                  <SelectValue placeholder={numberItems[0]} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {numberItems.map((row, id) => (
-                      <SelectItem value={row.toString()} key={id}>
-                        {row}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="flex items-center">
-            <nav
-              className="relative z-0 inline-flex rounded-md  "
-              aria-label="Pagination"
+        <RowPageFilter
+          data={products}
+          numberItems={numberItems}
+          setItem={
+            setProductItem as React.Dispatch<
+              React.SetStateAction<productType[] | categoryType[]>
             >
-              <button
-                className="relative shadow-xs inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
-                disabled={setting.page - 1 <= 0 ? true : false}
-                style={
-                  setting.page - 1 <= 0 ? { backgroundColor: "#DBDBDB" } : {}
-                }
-                onClick={() => handleChangePage(setting.page, "prev")}
-              >
-                <span className="sr-only">Previous</span>
-                <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-              </button>
-              <span className="text-sm text-gray-700  content-center mx-[1rem]">
-                Page {setting.page}
-              </span>
-              <button
-                className="relative shadow-xs inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 cursor-pointer hover:bg-gray-50"
-                onClick={() => handleChangePage(setting.page, "next")}
-                disabled={
-                  setting.page * setting.numberItems >= products.length
-                    ? true
-                    : false
-                }
-                style={
-                  setting.page * setting.numberItems >= products.length
-                    ? { backgroundColor: "#DBDBDB" }
-                    : {}
-                }
-              >
-                <span className="sr-only">Next</span>
-                <ChevronRight className="h-5 w-5" aria-hidden="true" />
-              </button>
-            </nav>
-          </div>
-        </div>
+          }
+        />
       </div>
 
       <div className="fixed bottom-6 right-6">

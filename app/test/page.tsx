@@ -1,27 +1,20 @@
-"use server";
-import Image from "next/image";
-import React from "react";
-import { pinata } from "@/utils/config";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../state/store";
-import SkeletionImages from "@/components/custom/loading";
-import { signIn, useSession } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import SplitText from "@/components/ui/blocks/TextAnimations/SplitText/SplitText";
-import TrueFocus from "@/components/ui/text-animations/TrueFocus/TrueFocus";
-import RowPageFilter from "@/components/custom/row-page-filter";
-import { getData } from "../action/category";
+import { columnsCategories } from "@/components/ui/table/colums-categories";
+import { DataTable } from "@/components/ui/table/data-table";
+import { categoryType } from "@/types/itemTypes";
+import { PrismaClient } from "@prisma/client";
 
-const handleAnimationComplete = () => {
-  console.log("All letters have animated!");
-};
+async function getData(): Promise<categoryType[]> {
+  const prisma = new PrismaClient();
+  const data = await prisma.categories.findMany();
+  return data;
+}
 
-const page = async () => {
-  // const { data: session } = useSession();
-  // console.log(session, "session");
-  const numberItems = [5, 10, 15, 20, 30];
+export default async function DemoPage() {
   const data = await getData();
-  return <RowPageFilter data={data} numberItems={numberItems} />;
-};
 
-export default page;
+  return (
+    <div className="container mx-auto py-auto">
+      <DataTable columns={columnsCategories} data={data} />
+    </div>
+  );
+}

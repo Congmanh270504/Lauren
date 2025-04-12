@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Check } from "lucide-react";
 
 interface CheckboxIconProps {
@@ -16,12 +15,9 @@ export default function CheckboxIconCustom({
   size = 24,
   className = "",
 }: CheckboxIconProps) {
-  const [isChecked, setIsChecked] = useState(checked);
-
   const handleToggle = () => {
-    const newState = !isChecked;
-    setIsChecked(newState);
-    onChange?.(newState);
+    const newState = !checked; // Use the prop value directly
+    onChange?.(newState); // Notify the parent of the change
   };
 
   return (
@@ -30,7 +26,7 @@ export default function CheckboxIconCustom({
       style={{ width: size, height: size }}
       onClick={handleToggle}
       role="checkbox"
-      aria-checked={isChecked}
+      aria-checked={checked}
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
@@ -39,7 +35,7 @@ export default function CheckboxIconCustom({
         }
       }}
     >
-      {isChecked ? (
+      {checked ? (
         <div className="flex items-center justify-center w-full h-full rounded-md bg-violet-500 text-white">
           <Check size={size * 0.6} strokeWidth={3} />
         </div>

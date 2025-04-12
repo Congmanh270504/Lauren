@@ -24,10 +24,6 @@ import RowPageFilter from "@/components/custom/row-page-filter";
 interface CategoryTableProps {
   category: categoryType[];
 }
-interface RowPageProps {
-  numberItems: number;
-  page: number;
-}
 
 const CategoryTable: React.FC<CategoryTableProps> = ({ category }) => {
   const [categoriesItem, setCategoriesItem] = useState(category.slice(0, 2));
