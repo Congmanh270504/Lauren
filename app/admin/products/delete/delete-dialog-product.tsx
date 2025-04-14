@@ -17,17 +17,26 @@ import { Toaster, toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/app/state/store";
 import { Trash2 } from "lucide-react";
-
+import { clearDeleteChecked } from "@/app/state/deleteChecked/deleteChecked";
+import { useRouter } from "next/navigation";
 export default function DeleteDialogProduct() {
   const deleteChecked = useSelector((state: RootState) => state.deleteChecked);
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  const [isPending, setIsPending] = React.useState(false);
   const handleDeleteAllProduct = async () => {
     try {
-      const response = await deleteAllProduct(deleteChecked);
+      setIsPending(true);
+      console.log("fdasfadsf");
+      const response = await deleteAllProduct(deleteChecked); // error
       if (response && response.ok) {
         toast.success("Delete product has been successfully");
+        dispatch(clearDeleteChecked());
+        // router.push("/admin/products"); // redirect to products page
       } else {
         toast.error("Delete product has not been failed");
       }
+      setIsPending(false);
     } catch (error) {
       toast.error("Event has not been created");
     }

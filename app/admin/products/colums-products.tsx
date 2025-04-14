@@ -65,8 +65,6 @@ export const columnsProducts: ColumnDef<productType>[] = [
             dispatch(
               setDeleteChecked({ id: row.original.id, checked: !!value }) // Corrected payload
             );
-
-            console.log("row", row.original.id);
           }}
           aria-label="Select row"
         />
@@ -85,7 +83,7 @@ export const columnsProducts: ColumnDef<productType>[] = [
       return (
         <span className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl">
           <Image
-            src={productUrl ? productUrl.url : "/placeholder.jpg"}
+            src={productUrl ? productUrl.url : "/1.jpg"}
             width={100}
             height={100}
             alt=""

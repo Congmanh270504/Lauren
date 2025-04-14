@@ -62,51 +62,44 @@ export async function deleteAllProduct(
       return;
     }
     // store images in array 2d
-    const images = await Promise.all(
+    const selectImages = await Promise.all(
       products.map(async (product) => {
         const images = await prisma.images.findMany({
           where: {
             productId: new ObjectId(product.id).toString(),
           },
         });
-        return images;
+        return images.length > 0 ? images : null; // Return null if no images are found
       })
-    );
+    ).then((results) => results.filter((images) => images !== null)); // Filter out null values
 
     // deleteMany image with productId
-    await Promise.all(
-      products.map(async (product) => {
-        await prisma.products.deleteMany({
-          where: {
-            id: new ObjectId(product.id).toString(),
-          },
-        });
-      })
-    );
-    
+    products.map(async (product) => {
+      await prisma.products.deleteMany({
+        where: {
+          id: new ObjectId(product.id).toString(),
+        },
+      });
+    });
+
     // deleteMany product with productId
-    await Promise.all(
-      products.map(async (product) => {
-        await prisma.products.delete({
+    selectImages.map(async (img) => {
+      if (img && img[0]) {
+        await prisma.images.deleteMany({
           where: {
-            id: new ObjectId(product.id).toString(),
+            productId: new ObjectId(img[0].productId).toString(),
           },
         });
+      }
+    });
+
+    const cidImages = selectImages.flat().map((url) => url.url);
+    const deleteFilesPinata = await Promise.all(
+      cidImages.map(async (cid) => {
+        const files = await pinata.files.private.list().cid(cid);
+        return files.files[0].id;
       })
     );
-
-    const allFiles = await pinata.files.private.list(); // files{files: [{}]} type files
-
-    const imageUrls = await Promise.all(
-      allFiles.files.map((file) => {
-        return images.map((img) => img.map((img) => img.url === file.cid))
-          ? file.cid
-          : null;
-      })
-    );
-    console.log("imageUrlshhh", imageUrls);
-    const deleteFilesPinata = imageUrls.filter((url) => url !== null);
-
     await pinata.files.private.delete(deleteFilesPinata);
     // revalidatePath("/");
     return { ok: true, message: "Product deleted successfully" };

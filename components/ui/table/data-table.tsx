@@ -82,8 +82,6 @@ export function DataTable<TData, TValue>({
   React.useEffect(() => {
     dispatch(fetchInitialImages()); // Dispatch the thunk to fetch images once
   }, [dispatch]);
-  console.log("deleteChecked", deleteChecked);
-  // const dispatch = useDispatch();
   const totalColum = table.getAllColumns().length - 3;
   return (
     <div className="w-full">
