@@ -55,7 +55,7 @@ const DataTableToolbar = <TData,>({ table }: { table: Table<TData> }) => {
           </div>
           {checkboxItem.id === "createdAt" ||
           checkboxItem.id === "updatedAt" ? (
-            <DatePickerWithRange />
+            <DatePickerWithRange table={table} />
           ) : (
             <Input
               placeholder={`Filter ${checkboxItem.id}...`}

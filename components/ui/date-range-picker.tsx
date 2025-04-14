@@ -13,14 +13,18 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-export default function DatePickerWithRange({
+import { Table } from "@tanstack/react-table";
+const DatePickerWithRange = <TData,>({
+  table,
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: {
+  table: Table<TData>;
+  className?: React.HTMLAttributes<HTMLDivElement>;
+}) => {
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2025, 3, 3),
+    from: new Date(2025, 0, 20),
+    to: addDays(new Date(2025, 0, 20), 20),
   });
-  console.log("date", date);
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -38,11 +42,10 @@ export default function DatePickerWithRange({
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
+                  {format(date.from, "dd/MM/y")} - {format(date.to, "dd/MM/y")}
                 </>
               ) : (
-                format(date.from, "LLL dd, y")
+                format(date.from, "dd/MM/y")
               )
             ) : (
               <span>Pick a date</span>
@@ -57,9 +60,15 @@ export default function DatePickerWithRange({
             selected={date}
             onSelect={setDate}
             numberOfMonths={2}
+            onDayClick={() => {
+              table
+                .getColumn("createdAt")
+                ?.setFilterValue({ from: date?.from, to: date?.to });
+            }}
           />
         </PopoverContent>
       </Popover>
     </div>
   );
-}
+};
+export default DatePickerWithRange;

@@ -1,7 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { getAllProductsImages } from "@/app/action/products";
 
-import { imagesTpye } from "@/types/itemTypes";
-const initImageState: imagesTpye[] = [];
+interface imagesTpyePops {
+  id: string;
+  url: string;
+}
+const initImageState: imagesTpyePops[] = [];
+
+// Async thunk to fetch initial images
+export const fetchInitialImages = createAsyncThunk(
+  "images/fetchInitialImages",
+  async () => {
+    const images = await getAllProductsImages();
+    return images;
+  }
+);
 
 const imageSlice = createSlice({
   name: "images",
@@ -10,14 +23,13 @@ const imageSlice = createSlice({
     setImages: (state, action) => {
       return action.payload;
     },
-    addImage: (state, action) => {
-      state.push(action.payload);
-    },
-    deleteImage: (state, action) => {
-      return state.filter((img) => img.id !== action.payload.id);
-    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(fetchInitialImages.fulfilled, (state, action) => {
+      return action.payload;
+    });
   },
 });
 
-export const { setImages, addImage, deleteImage } = imageSlice.actions;
+export const { setImages } = imageSlice.actions;
 export default imageSlice.reducer;

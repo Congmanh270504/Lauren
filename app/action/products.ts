@@ -6,12 +6,27 @@ import { ObjectId } from "mongodb";
 import { imagesTpye } from "@/types/itemTypes";
 import { productType } from "@/types/itemTypes";
 import { pinata } from "@/utils/config";
+import { console } from "inspector";
 
 interface dataType {
   productName: string;
   price: number;
   categoryId: string;
   productsImages: string[];
+}
+export async function getProducts() {
+  try {
+    const products = await prisma.products.findMany({
+      include: {
+        img: true,
+        Category: true,
+      },
+    });
+    return products;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return [];
+  }
 }
 export async function createProduct(data: dataType) {
   if (!data.productName.trim()) {
@@ -36,38 +51,64 @@ export async function createProduct(data: dataType) {
     return { ok: false, message: "Failed to create product" };
   }
 }
-export async function deleteProduct(id: string) {
+export async function deleteAllProduct(
+  products: {
+    id: string;
+    checked: boolean;
+  }[]
+) {
   try {
-    if (!id.trim()) {
+    if (!products) {
       return;
     }
-    const images = await prisma.images.findMany({
-      where: {
-        productId: new ObjectId(id).toString(),
-      },
-    });
-    await prisma.images.deleteMany({
-      where: {
-        productId: new ObjectId(id).toString(),
-      },
-    });
-    await prisma.products.delete({
-      where: {
-        id: new ObjectId(id).toString(),
-      },
-    });
-    const files = await pinata.files.private.list(); // files{files: [{}]} type files
-    console.log(files);
-    const imageUrls = files.files.filter((file) =>
-      images.map((img) => img.url).includes(file.cid)
+    // store images in array 2d
+    const images = await Promise.all(
+      products.map(async (product) => {
+        const images = await prisma.images.findMany({
+          where: {
+            productId: new ObjectId(product.id).toString(),
+          },
+        });
+        return images;
+      })
     );
-    console.log(imageUrls);
-    const deleteFiles = imageUrls.map((file) => file.id);
-    // const imageUrls = files.map((file) => file.);
-    // await pinata.files.private.delete(files);
 
-    await pinata.files.private.delete(deleteFiles);
-    revalidatePath("/");
+    // deleteMany image with productId
+    await Promise.all(
+      products.map(async (product) => {
+        await prisma.products.deleteMany({
+          where: {
+            id: new ObjectId(product.id).toString(),
+          },
+        });
+      })
+    );
+    
+    // deleteMany product with productId
+    await Promise.all(
+      products.map(async (product) => {
+        await prisma.products.delete({
+          where: {
+            id: new ObjectId(product.id).toString(),
+          },
+        });
+      })
+    );
+
+    const allFiles = await pinata.files.private.list(); // files{files: [{}]} type files
+
+    const imageUrls = await Promise.all(
+      allFiles.files.map((file) => {
+        return images.map((img) => img.map((img) => img.url === file.cid))
+          ? file.cid
+          : null;
+      })
+    );
+    console.log("imageUrlshhh", imageUrls);
+    const deleteFilesPinata = imageUrls.filter((url) => url !== null);
+
+    await pinata.files.private.delete(deleteFilesPinata);
+    // revalidatePath("/");
     return { ok: true, message: "Product deleted successfully" };
   } catch (error) {
     return { ok: false, message: "Failed to delete product" };
@@ -113,11 +154,17 @@ export async function updateProduct(
     return { ok: false, message: "Failed to update product" };
   }
 }
-export async function getProductsImages(products: productType[]) {
-  if (!products || products.length === 0) {
-    return [];
-  }
+export async function getAllProductsImages() {
   try {
+    const products = await prisma.products.findMany({
+      include: {
+        img: true,
+        Category: true,
+      },
+    });
+    if (!products || products.length === 0) {
+      return [];
+    }
     // Map through the products and extract the first image URL for each product
     const images = await Promise.all(
       products.map(async (product) => {
@@ -127,17 +174,40 @@ export async function getProductsImages(products: productType[]) {
             cid: firstImage.url || "",
             expires: 30,
           });
-          return url;
+          return { id: product.id, url: url };
         }
-        return null; // Return null if no images are available
+        return null; // Return null if no image is found
       })
     );
 
     // Filter out null values
-    const validImages = images.filter((url) => url !== null) as string[];
+    const validImages = images.filter((image) => image !== null);
     return validImages;
   } catch (error) {
     console.error("Error getting product images:", error);
     return [];
+  }
+}
+export async function getProductImages(productsId: string | undefined) {
+  if (productsId === undefined) {
+    return null;
+  }
+  try {
+    const images = await prisma.images.findFirst({
+      where: {
+        productId: new ObjectId(productsId).toString(),
+      },
+    });
+    if (!images) {
+      return null;
+    }
+    const imageUrl = await pinata.gateways.private.createAccessLink({
+      cid: images.url,
+      expires: 30,
+    });
+    return imageUrl;
+  } catch (error) {
+    console.error("Error getting product images:", error);
+    return null;
   }
 }

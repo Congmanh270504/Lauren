@@ -15,29 +15,60 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 import { convertToVNDay } from "@/app/action/helper";
+import { useDispatch } from "react-redux";
+import {
+  checkAll,
+  clearDeleteChecked,
+  setDeleteChecked,
+} from "@/app/state/deleteChecked/deleteChecked";
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
 export const columnsCategories: ColumnDef<categoryType>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
+    id: "id",
+    header: ({ table }) => {
+      const dispatch = useDispatch();
+      return (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => {
+            table.toggleAllPageRowsSelected(!!value);
+            value
+              ? table.getRowModel().rows.forEach((row) => {
+                  dispatch(
+                    setDeleteChecked({ id: row.original.id, checked: true }) // Corrected payload
+                  );
+                })
+              : dispatch(
+                  clearDeleteChecked() // Corrected payload
+                );
+          }}
+          aria-label="Select all"
+        />
+      );
+    },
+    cell: ({ row }) => {
+      const dispatch = useDispatch();
+      return (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => {
+            row.toggleSelected(!!value);
+            dispatch(
+              setDeleteChecked({ id: row.original.id, checked: !!value }) // Corrected payload
+            );
+
+            console.log("row", row.original.id);
+          }}
+          aria-label="Select row"
+        />
+      );
+    },
     enableSorting: false,
     enableHiding: false,
   },
@@ -130,8 +161,7 @@ export const columnsCategories: ColumnDef<categoryType>[] = [
               Copy category ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View category details</DropdownMenuItem>
+            <DropdownMenuItem>Edit category details</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );

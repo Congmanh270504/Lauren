@@ -1,20 +1,17 @@
-import { columnsCategories } from "@/components/ui/table/colums-categories";
-import { DataTable } from "@/components/ui/table/data-table";
-import { categoryType } from "@/types/itemTypes";
-import { PrismaClient } from "@prisma/client";
+"use client";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/app/state/store";
+import { fetchInitialImages } from "../state/images/images";
 
-async function getData(): Promise<categoryType[]> {
-  const prisma = new PrismaClient();
-  const data = await prisma.categories.findMany();
-  return data;
-}
+export default function DemoPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const images = useSelector((state: RootState) => state.images);
 
-export default async function DemoPage() {
-  const data = await getData();
+  useEffect(() => {
+    dispatch(fetchInitialImages()); // Dispatch the thunk to fetch images
+  }, [dispatch]);
+  console.log("images", images);
 
-  return (
-    <div className="container mx-auto py-auto">
-      <DataTable columns={columnsCategories} data={data} />
-    </div>
-  );
+  return <div className="container mx-auto py-auto">aaa</div>;
 }

@@ -21,17 +21,34 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  checkAll,
+  clearDeleteChecked,
+  setDeleteChecked,
+} from "@/app/state/deleteChecked/deleteChecked";
 
 import DataTablePagination from "./data-table-pagination";
 import DataTableToolbar from "./data-table-toolbar";
+import { useSelector } from "react-redux";
+import { RootState } from "@/app/state/store";
+import { useDispatch } from "react-redux";
+import { Button } from "../button";
+import { Trash2 } from "lucide-react";
+import { categoryType } from "@/types/itemTypes";
 
+import { AppDispatch } from "@/app/state/store";
+import { fetchInitialImages } from "@/app/state/images/images";
+import DeleteDialogProduct from "@/app/admin/products/delete/delete-dialog-product";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  type: string;
 }
 export function DataTable<TData, TValue>({
   columns,
   data,
+  type,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -41,6 +58,7 @@ export function DataTable<TData, TValue>({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  // console.log("deleteChecked", deleteChecked);
   const table = useReactTable({
     data,
     columns,
@@ -59,29 +77,88 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   });
-
+  const deleteChecked = useSelector((state: RootState) => state.deleteChecked);
+  const dispatch = useDispatch<AppDispatch>();
+  React.useEffect(() => {
+    dispatch(fetchInitialImages()); // Dispatch the thunk to fetch images once
+  }, [dispatch]);
+  console.log("deleteChecked", deleteChecked);
+  // const dispatch = useDispatch();
+  const totalColum = table.getAllColumns().length - 3;
   return (
     <div className="w-full">
       <DataTableToolbar table={table} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+            {deleteChecked.length > 0 ? (
+              <TableRow>
+                <TableHead>
+                  <Checkbox
+                    checked={table.getIsAllPageRowsSelected()}
+                    onCheckedChange={(value) => {
+                      if (table.getIsAllPageRowsSelected() === false) {
+                        table.toggleAllPageRowsSelected(true);
+                        dispatch(
+                          clearDeleteChecked() // Corrected payload
+                        );
+                        table.getRowModel().rows.forEach((row) => {
+                          let rowOriginal = row.original as categoryType;
+                          dispatch(
+                            setDeleteChecked({
+                              id: rowOriginal.id,
+                              checked: true,
+                            }) // Corrected payload
+                          );
+                        });
+                      } else {
+                        table.toggleAllPageRowsSelected(!!value);
+                        dispatch(
+                          clearDeleteChecked() // Corrected payload
+                        );
+                      }
+                    }}
+                  />
+                </TableHead>
+                <TableHead>
+                  {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                  {table.getRowCount()} row(s) selected.
+                </TableHead>
+
+                {Array.from({ length: totalColum }, (_, index) => (
+                  <TableHead key={index} className="text-transparent">
+                    aaa
+                  </TableHead>
+                ))}
+
+                <TableHead className="text-right">
+                  {type === "product" ? (
+                    <DeleteDialogProduct />
+                  ) : (
+                    <Button variant={"destructive"} className="ml-auto my-1">
+                      Delete All C <Trash2 className="ml-2 h-4 w-4" />
+                    </Button>
+                  )}
+                </TableHead>
               </TableRow>
-            ))}
+            ) : (
+              table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
+                </TableRow>
+              ))
+            )}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (

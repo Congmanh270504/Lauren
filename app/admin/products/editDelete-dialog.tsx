@@ -16,7 +16,7 @@ import { RootState } from "@/app/state/store"; // Import RootState
 import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import EditFormDialog from "@/app/admin/categories/edit/editForm-dialog";
-import DeleteFormDialog from "./delete/delete-dialog";
+import DeleteDialogProduct from "./delete/delete-dialog-product";
 import { productType } from "@/types/itemTypes";
 export default function EditDeleteDialog({
   products,
@@ -50,7 +50,7 @@ export default function EditDeleteDialog({
             aria-labelledby="options-menu"
           >
             <EditFormDialog id={products.id} />
-            <DeleteFormDialog products={products} />
+            <DeleteDialogProduct products={products} />
           </div>
         </div>
       )}

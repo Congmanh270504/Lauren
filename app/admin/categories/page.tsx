@@ -1,6 +1,6 @@
 import React from "react";
 import { DataTable } from "@/components/ui/table/data-table";
-import { columnsCategories } from "@/components/ui/table/colums-categories";
+import { columnsCategories } from "@/app/admin/categories/colums-categories";
 import { PrismaClient } from "@prisma/client";
 
 async function getData() {

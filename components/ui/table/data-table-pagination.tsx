@@ -5,10 +5,7 @@ import { Table } from "@tanstack/react-table";
 const DataTablePagination = <TData,>({ table }: { table: Table<TData> }) => {
   return (
     <div className="flex items-center justify-end space-x-2 py-4">
-      <div className="flex-1 text-sm text-muted-foreground">
-        {table.getFilteredSelectedRowModel().rows.length} of{" "}
-        {table.getState().pagination.pageSize } row(s) selected.
-      </div>
+      
       <div className="space-x-2">
         <Button
           onClick={() => table.firstPage()}
@@ -42,9 +39,10 @@ const DataTablePagination = <TData,>({ table }: { table: Table<TData> }) => {
           value={table.getState().pagination.pageSize}
           onChange={(e) => {
             table.setPageSize(Number(e.target.value));
+
           }}
         >
-          {[1, 2, 20, 30, 40].map((pageSize) => (
+          {[10, 15, 20, 30, 40].map((pageSize) => (
             <option key={pageSize} value={pageSize}>
               {pageSize}
             </option>

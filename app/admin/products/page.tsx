@@ -1,25 +1,14 @@
 import React from "react";
-import { PrismaClient } from "@prisma/client";
-import ProductTable from "./product-table";
-import { getProductsImages } from "@/app/action/products";
-
-async function getData() {
-  const prisma = new PrismaClient();
-  const data = await prisma.products.findMany({
-    include: {
-      img: true,
-      Category: true,
-    },
-  });
-  return data;
-}
+import { getProducts } from "@/app/action/products";
+import { DataTable } from "@/components/ui/table/data-table";
+import { columnsProducts } from "./colums-products";
 
 const page = async () => {
-  const products = await getData();
-  const productImages = await getProductsImages(products);
+  const products = await getProducts();
+
   return (
-    <div>
-      <ProductTable products={products} productImages={productImages} />
+    <div className="container mx-auto py-auto">
+      <DataTable columns={columnsProducts} data={products} type={"product"} />
     </div>
   );
 };
