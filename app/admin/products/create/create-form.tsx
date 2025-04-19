@@ -32,17 +32,12 @@ import {
 import { categoryType, imagesTpye } from "@/types/itemTypes";
 import { getRandomColor } from "@/app/action/helper";
 const CreateForm = ({ categories }: { categories: categoryType[] }) => {
-  const [files, setFiles] = useState<Array<{ file: File }>>([]);
   const router = useRouter();
   const [randomColor, setRadomColort] = useState<string>("");
-  //const [cid, setCid] = useState<Array<string>>([]);
   useEffect(() => {
     setRadomColort(getRandomColor());
   }, []);
-  const initialState = {
-    success: false,
-    message: "",
-  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,10 +47,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
       productsImages: [],
     },
   });
-  const [state, action, isPending] = React.useActionState(
-    serverAction,
-    initialState
-  );
+  const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
@@ -72,7 +64,6 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
     }
   };
   console.log("form", form.getValues("productsImages"));
-
   return (
     <div className="w-full p-4">
       <Form {...form}>
@@ -176,11 +167,8 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
                 </FormLabel>
                 <FormControl>
                   <UploadFile
-                    files={files}
-                    setFiles={setFiles}
-                    //cid={cid}
-                    //setCid={setCid}
                     field={field} // Pass the field object to the UploadFile component
+                    randomColor={randomColor}
                   />
                 </FormControl>
                 <FormMessage />
@@ -196,8 +184,16 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
               size="sm"
               type="submit"
               variant="submit"
+              disabled={isPending} // Disable if form is invalid or pending
             >
-              {isPending ? "Submitting..." : "Submit"}
+              {isPending ? (
+                <div>
+                  Submitting...{" "}
+                  <span className="loading loading-dots loading-xs"></span>
+                </div>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </div>
         </form>

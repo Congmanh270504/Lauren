@@ -9,15 +9,16 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { imagesTpye } from "@/types/itemTypes";
 import SkeletionImages from "./loading";
-
+import { CircleX } from "lucide-react";
 interface UploadFileProps {
-  files: Array<{ file: File }>;
-  setFiles: React.Dispatch<React.SetStateAction<Array<{ file: File }>>>;
   field: any; // Add this line to accept the field object from react-hook-form
+  randomColor?: string;
 }
 
-const UploadFile: React.FC<UploadFileProps> = ({ files, setFiles, field }) => {
+const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
+  const [files, setFiles] = useState<Array<{ file: File }>>([]);
   const [isPending, setIsPending] = useState(false);
+
   const dropZoneConfig = {
     accept: ["jpg", "jpeg", "png"],
     maxSize: 1024 * 1024 * 10,
@@ -33,35 +34,85 @@ const UploadFile: React.FC<UploadFileProps> = ({ files, setFiles, field }) => {
         body: data,
       });
       const response = await uploadFile.json();
-      setIsPending(false);
       let list = field.value as string[]; // Get the current value of the field
       list.push(response.cid); // Add the new cid to the list
-      console.log("list", list);
       field.onChange(list); // Update the form field with the current cid array
+      setIsPending(false);
     } catch (error) {
       toast.error("Error uploading file");
       setIsPending(false);
     }
   };
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    console.log("acceptedFiles", acceptedFiles);
-    acceptedFiles.forEach((file) => {
-      if (!dropZoneConfig.accept.some((ext) => file.type.endsWith(ext))) {
-        toast.error(
-          "File type not supported. Please upload a valid image file."
-        );
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      if (files.length + acceptedFiles.length > 6) {
+        toast.error("You can only upload up to 6 files.");
         return;
       }
-      if ((file.size ?? 0) > dropZoneConfig.maxSize) {
-        toast.error("Size image is too big. Please upload a valid image file.");
-        return;
-      }
-      setFiles((prev) => [...prev, { file }]);
-      handleFileChange(file);
-    });
-  }, []);
 
+      const errors: string[] = []; // Collect validation errors
+
+      const validFiles = acceptedFiles.filter((file) => {
+        // Check if the file already exists
+        if (files.some((f) => f.file.name === file.name)) {
+          errors.push(`File "${file.name}" already exists.`);
+          return false;
+        }
+
+        // Validate file type
+        if (!dropZoneConfig.accept.some((ext) => file.type.endsWith(ext))) {
+          errors.push(`File "${file.name}" has an unsupported file type.`);
+          return false;
+        }
+
+        // Validate file size
+        if ((file.size ?? 0) > dropZoneConfig.maxSize) {
+          errors.push(`File "${file.name}" exceeds the maximum size of 10MB.`);
+          return false;
+        }
+
+        return true; // File is valid
+      });
+
+      // Show all errors in a single toast
+      if (errors.length > 0) {
+        toast.error(errors.join("\n"));
+      }
+
+      // Update state with valid files
+      setFiles((prevFiles) => [
+        ...prevFiles,
+        ...validFiles.map((file) => ({ file })),
+      ]);
+
+      // Trigger file upload for valid files
+      validFiles.forEach((file) => handleFileChange(file));
+    },
+    [files]
+  );
+  const handleRemoveFile = async (index: number) => {
+    setIsPending(true);
+    const deleteFile = await fetch("/api/deleteFile", {
+      method: "DELETE",
+      body: JSON.stringify({ fileName: files[index].file.name }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const response = await deleteFile.json();
+    if (response.error) {
+      toast.error("Error deleting file");
+      setIsPending(false);
+      return;
+    }
+    toast.success("File remove successfully");
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    const list = field.value as string[]; // Get the current value of the field
+    list.splice(index, 1);
+    field.onChange(list);
+    setIsPending(false);
+  };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
@@ -75,7 +126,15 @@ const UploadFile: React.FC<UploadFileProps> = ({ files, setFiles, field }) => {
           <p>Drop the files here ...</p>
         ) : (
           <div>
-            {files.length > 0 ? (
+            {isPending ? (
+              <div>
+                Hang tight pls{" "}
+                <span
+                  className="loading loading-dots loading-xs"
+                  style={{ color: randomColor }}
+                ></span>
+              </div>
+            ) : files.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-4">
                 {files.map((file, index) => (
                   <div
@@ -86,10 +145,14 @@ const UploadFile: React.FC<UploadFileProps> = ({ files, setFiles, field }) => {
                       src={URL.createObjectURL(file.file)}
                       alt="Uploaded image"
                       fill
-                      objectFit="cover"
                       className="rounded-md object-cover"
                       sizes="200px"
                       quality={100}
+                    />
+                    <CircleX
+                      className="absolute top-1 right-2 cursor-pointer"
+                      style={{ color: randomColor }}
+                      onClick={() => handleRemoveFile(index)}
                     />
                   </div>
                 ))}
@@ -114,6 +177,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ files, setFiles, field }) => {
         name="productsImages"
         type="file"
         className="hidden"
+        disabled={isPending}
       />
     </div>
   );

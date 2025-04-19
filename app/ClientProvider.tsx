@@ -71,7 +71,7 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
           {children}
         </SidebarInset>
       </SidebarProvider>
-      <Toaster richColors position="bottom-right" />
+      <Toaster richColors closeButton position="bottom-right" />
     </Provider>
   );
 };

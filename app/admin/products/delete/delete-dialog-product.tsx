@@ -32,11 +32,11 @@ export default function DeleteDialogProduct() {
       if (response && response.ok) {
         toast.success("Delete product has been successfully");
         dispatch(clearDeleteChecked());
-        // router.push("/admin/products"); // redirect to products page
       } else {
         toast.error("Delete product has not been failed");
       }
       setIsPending(false);
+      router.refresh();
     } catch (error) {
       toast.error("Event has not been created");
     }
