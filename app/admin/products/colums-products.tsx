@@ -77,13 +77,12 @@ export const columnsProducts: ColumnDef<productType>[] = [
     accessorKey: "images",
     header: "Images",
     cell: ({ row }) => {
-      wait(1000);
       const images = useSelector((state: RootState) => state.images);
       const productUrl = images.find((url) => url.id === row.original.id);
-      return (
+      return productUrl ? (
         <span className="aspect-square rounded-md object-cover w-16 h-16 flex justify-center items-center bg-gray-200 text-xl">
           <Image
-            src={productUrl ? productUrl.url : "/1.jpg"}
+            src={productUrl.url}
             width={100}
             height={100}
             alt=""
@@ -91,6 +90,8 @@ export const columnsProducts: ColumnDef<productType>[] = [
             className="w-full h-full object-cover rounded-xl"
           />
         </span>
+      ) : (
+        <span className="loading loading-spinner loading-xl"></span>
       );
     },
   },

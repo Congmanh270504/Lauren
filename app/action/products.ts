@@ -33,6 +33,15 @@ export async function createProduct(data: dataType) {
     return { ok: false, message: "Product name is required" };
   }
   try {
+    const isExist = await prisma.products.findFirst({
+      where: {
+        productName: data.productName,
+      },
+    });
+    if (isExist) {
+      return { ok: false, message: "Product name already exists" };
+    }
+
     const product = await prisma.products.create({
       data: {
         productName: data.productName,
@@ -74,23 +83,21 @@ export async function deleteAllProduct(
     ).then((results) => results.filter((images) => images !== null)); // Filter out null values
 
     // deleteMany image with productId
-    products.map(async (product) => {
-      await prisma.products.deleteMany({
+    products.map(async (prod) => {
+      await prisma.images.deleteMany({
         where: {
-          id: new ObjectId(product.id).toString(),
+          productId: new ObjectId(prod.id).toString(),
         },
       });
     });
 
     // deleteMany product with productId
-    selectImages.map(async (img) => {
-      if (img && img[0]) {
-        await prisma.images.deleteMany({
-          where: {
-            productId: new ObjectId(img[0].productId).toString(),
-          },
-        });
-      }
+    products.map(async (product) => {
+      await prisma.products.delete({
+        where: {
+          id: new ObjectId(product.id).toString(),
+        },
+      });
     });
 
     const cidImages = selectImages.flat().map((url) => url.url);
@@ -101,8 +108,10 @@ export async function deleteAllProduct(
       })
     );
     await pinata.files.private.delete(deleteFilesPinata);
-    // revalidatePath("/");
-    return { ok: true, message: "Product deleted successfully" };
+    return {
+      ok: true,
+      message: "Product deleted successfully",
+    };
   } catch (error) {
     return { ok: false, message: "Failed to delete product" };
   }

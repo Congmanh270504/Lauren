@@ -13,11 +13,17 @@ import { CircleX } from "lucide-react";
 interface UploadFileProps {
   field: any; // Add this line to accept the field object from react-hook-form
   randomColor?: string;
+  isLoadingFile: boolean;
+  setIsLoadingFile: (value: boolean) => void;
 }
 
-const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
+const UploadFile: React.FC<UploadFileProps> = ({
+  field,
+  randomColor,
+  isLoadingFile,
+  setIsLoadingFile,
+}) => {
   const [files, setFiles] = useState<Array<{ file: File }>>([]);
-  const [isPending, setIsPending] = useState(false);
 
   const dropZoneConfig = {
     accept: ["jpg", "jpeg", "png"],
@@ -26,7 +32,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
 
   const handleFileChange = async (file: File) => {
     try {
-      setIsPending(true);
+      setIsLoadingFile(true);
       const data = new FormData();
       data.set("file", file);
       const uploadFile = await fetch("/api/uploadFiles", {
@@ -37,10 +43,10 @@ const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
       let list = field.value as string[]; // Get the current value of the field
       list.push(response.cid); // Add the new cid to the list
       field.onChange(list); // Update the form field with the current cid array
-      setIsPending(false);
+      setIsLoadingFile(false);
     } catch (error) {
       toast.error("Error uploading file");
-      setIsPending(false);
+      setIsLoadingFile(false);
     }
   };
 
@@ -92,7 +98,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
     [files]
   );
   const handleRemoveFile = async (index: number) => {
-    setIsPending(true);
+    setIsLoadingFile(true);
     const deleteFile = await fetch("/api/deleteFile", {
       method: "DELETE",
       body: JSON.stringify({ fileName: files[index].file.name }),
@@ -103,7 +109,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
     const response = await deleteFile.json();
     if (response.error) {
       toast.error("Error deleting file");
-      setIsPending(false);
+      setIsLoadingFile(false);
       return;
     }
     toast.success("File remove successfully");
@@ -111,7 +117,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
     const list = field.value as string[]; // Get the current value of the field
     list.splice(index, 1);
     field.onChange(list);
-    setIsPending(false);
+    setIsLoadingFile(false);
   };
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
@@ -126,7 +132,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
           <p>Drop the files here ...</p>
         ) : (
           <div>
-            {isPending ? (
+            {isLoadingFile ? (
               <div>
                 Hang tight pls{" "}
                 <span
@@ -177,7 +183,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ field, randomColor }) => {
         name="productsImages"
         type="file"
         className="hidden"
-        disabled={isPending}
+        disabled={isLoadingFile}
       />
     </div>
   );

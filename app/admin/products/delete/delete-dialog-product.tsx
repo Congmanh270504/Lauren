@@ -19,16 +19,23 @@ import { AppDispatch, RootState } from "@/app/state/store";
 import { Trash2 } from "lucide-react";
 import { clearDeleteChecked } from "@/app/state/deleteChecked/deleteChecked";
 import { useRouter } from "next/navigation";
-export default function DeleteDialogProduct() {
+interface DeleteDialogProductProps {
+  setIsPending: (isPending: boolean) => void;
+  handleProgress: () => void;
+}
+export default function DeleteDialogProduct({
+  setIsPending,
+  handleProgress,
+}: DeleteDialogProductProps) {
   const deleteChecked = useSelector((state: RootState) => state.deleteChecked);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const [isPending, setIsPending] = React.useState(false);
+
   const handleDeleteAllProduct = async () => {
     try {
       setIsPending(true);
-      console.log("fdasfadsf");
-      const response = await deleteAllProduct(deleteChecked); // error
+      handleProgress();
+      const response = await deleteAllProduct(deleteChecked);
       if (response && response.ok) {
         toast.success("Delete product has been successfully");
         dispatch(clearDeleteChecked());

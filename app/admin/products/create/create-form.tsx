@@ -34,6 +34,7 @@ import { getRandomColor } from "@/app/action/helper";
 const CreateForm = ({ categories }: { categories: categoryType[] }) => {
   const router = useRouter();
   const [randomColor, setRadomColort] = useState<string>("");
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
   useEffect(() => {
     setRadomColort(getRandomColor());
   }, []);
@@ -51,16 +52,18 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
+      setIsPending(true);
       const response = await createProduct(data);
       if (response.ok) {
-        toast.success("Thêm sản phẩm thành công.");
+        toast.success(response.message);
+        form.reset();
         router.push("/");
-        router.refresh();
       } else {
-        toast.error("Đã xảy ra lỗi. Vui lòng thử lại");
+        toast.error(response.message);
       }
+      setIsPending(false);
     } catch (error) {
-      toast.error("Đã xảy ra lỗi khi thêm sản phẩm. Vui lòng thử lại.");
+      toast.error("Failed to create product");
     }
   };
   console.log("form", form.getValues("productsImages"));
@@ -169,6 +172,8 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
                   <UploadFile
                     field={field} // Pass the field object to the UploadFile component
                     randomColor={randomColor}
+                    isLoadingFile={isLoadingFile}
+                    setIsLoadingFile={setIsLoadingFile}
                   />
                 </FormControl>
                 <FormMessage />
@@ -184,7 +189,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
               size="sm"
               type="submit"
               variant="submit"
-              disabled={isPending} // Disable if form is invalid or pending
+              disabled={isPending || isLoadingFile} // Disable if form is invalid or pending
             >
               {isPending ? (
                 <div>
