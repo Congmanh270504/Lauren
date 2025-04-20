@@ -124,6 +124,11 @@ export async function updateProduct(data: dataType, productId: string) {
     const isExist = await prisma.products.findFirst({
       where: {
         productName: data.productName,
+        AND: {
+          id: {
+            not: new ObjectId(productId).toString(),
+          },
+        },
       },
     });
     if (isExist) {
@@ -136,13 +141,18 @@ export async function updateProduct(data: dataType, productId: string) {
         productId: new ObjectId(productId).toString(),
       },
     });
+
     if (oldImages.length > 0) {
-      const deleteImages = await prisma.images.deleteMany({
-        where: {
-          productId: new ObjectId(productId).toString(),
-        },
-      });
-      if (deleteImages) {
+      const deleteImages = await Promise.all(
+        oldImages.map(async () => {
+          await prisma.images.deleteMany({
+            where: {
+              productId: new ObjectId(productId).toString(),
+            },
+          });
+        })
+      );
+      if (!deleteImages) {
         return { ok: false, message: "Failed to delete old images" };
       }
     }
@@ -165,6 +175,7 @@ export async function updateProduct(data: dataType, productId: string) {
     if (!product) {
       return { ok: false, message: "Failed create product" };
     }
+
     await Promise.all(
       oldImages.map(async (image) => {
         const countImagesWithSameOldImagesUrl = await prisma.images.count({

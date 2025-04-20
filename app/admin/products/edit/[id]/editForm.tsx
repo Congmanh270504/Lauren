@@ -66,8 +66,8 @@ const EditForm = ({ product, categories }: EditFormProps) => {
       if (response.ok) {
         toast.success("Product updated successfully.");
         setIsPending(false);
-        router.push("/");
-        router.refresh();
+        // router.push("/");
+        // router.refresh();
       } else {
         toast.error("An error occurred. Please try again.");
         setIsPending(false);
@@ -76,10 +76,9 @@ const EditForm = ({ product, categories }: EditFormProps) => {
       toast.error(
         "An error occurred while updating the product. Please try again."
       );
-    } finally {
-      router.push("/");
-    }
+    } 
   };
+
   console.log("form", form.getValues("productsImages"));
 
   return (

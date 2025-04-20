@@ -39,33 +39,27 @@ const UploadFile: React.FC<UploadFileProps> = ({
     const fetchData = async () => {
       setIsLoadingFile(true);
       const result = await handleGetProductImages(); // Call the function
-      console.log("result", result); // Log the result
       if (result) {
-        setProductUrl(result); // Set the product URL state
+        setProductUrl(result); 
+        setFiles(
+          result.map((item) => ({
+            file: new File([], item.file.files[0]?.name || "unknown"), 
+          }))
+        );
       }
       setIsLoadingFile(false);
     };
     fetchData();
-  }, [productImages]);
+  }, [productImages]); 
+
   useEffect(() => {
-    files.length === 0 ? console.log("aa") : console.log("bb");
-  }, [files]);
+    console.log("Updated files:", files); // Log the updated files state
+  }, [files]); // Run this effect whenever `files` changes
+
   const dropZoneConfig = {
     accept: ["jpg", "jpeg", "png"],
     maxSize: 1024 * 1024 * 10,
   };
-
-  // useEffect(() => {
-  //   if (productImages && productImages.length > 0) {
-  //     setFiles(
-  //       productUrl.map((item) => ({
-  //         file: new File([], item.file.files[0]?.name || "unknown"), // Ensure the name is a string or use a fallback
-  //       }))
-  //     );
-  //   }
-  // }, [productImages]); // Run this effect only when productImages changes
-
-  console.log("files", files); // Log the files state
 
   const handleFileChange = async (file: File) => {
     try {
@@ -156,6 +150,15 @@ const UploadFile: React.FC<UploadFileProps> = ({
     setIsLoadingFile(false);
   };
 
+  const handleDeleteChangeFile = (cid: string) => {
+    setProductUrl((prev) =>
+      prev.filter((item) => item.file.files[0].cid !== cid)
+    );
+    const list = field.value as string[]; // Get the current value of the field
+    list.splice(list.indexOf(cid), 1);
+    field.onChange(list); // Update the form field with the current cid array
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
@@ -177,9 +180,8 @@ const UploadFile: React.FC<UploadFileProps> = ({
                   style={{ color: randomColor ? randomColor : "#000" }}
                 ></span>
               </div>
-            ) : (productImages && productImages.length > 0) ||
-              files.length > 0 ? (
-              <div className="flex flex-wrap gap-2 mt-4">
+            ) : productUrl.length > 0 || files.length > 0 ? (
+              <div className="grid grid-cols-3 place-items-center gap-2 my-4">
                 {productUrl.map((file, index) => (
                   <div
                     key={index}
@@ -196,11 +198,13 @@ const UploadFile: React.FC<UploadFileProps> = ({
                     <CircleX
                       className="absolute top-1 right-2 cursor-pointer"
                       style={{ color: randomColor }}
-                      onClick={() => handleRemoveFile(index)}
+                      onClick={() =>
+                        handleDeleteChangeFile(file.file.files[0].cid)
+                      }
                     />
                   </div>
                 ))}
-                {files.map((file, index) => (
+                {files.slice(productUrl.length).map((file, index) => (
                   <div
                     key={index}
                     className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
