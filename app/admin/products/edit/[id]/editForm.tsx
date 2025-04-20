@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as z from "zod";
 import { formSchema } from "../../form-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,13 +20,28 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { updateProduct } from "@/app/action/products";
 import { productType } from "@/types/itemTypes";
-
-const EditForm = ({ product }: { product: productType }) => {
-  const [imageURL, setImageURL] = useState<string[]>(
-    product.img ? product.img.map((img) => img.url) : []
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+import { categoryType } from "@/types/itemTypes";
+import { getRandomColor } from "@/app/action/helper";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+interface EditFormProps {
+  categories: categoryType[];
+  product: productType;
+}
+const EditForm = ({ product, categories }: EditFormProps) => {
   const router = useRouter();
+  const [randomColor, setRadomColort] = useState<string>("");
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
+  useEffect(() => {
+    setRadomColort(getRandomColor());
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,21 +49,28 @@ const EditForm = ({ product }: { product: productType }) => {
       productName: product.productName,
       price: product.price,
       categoryId: product.categoryId,
-      productsImages: [],
+      productsImages: product.img ? product.img.map((image) => image.url) : [], // Initialize with existing images
     },
   });
+  const [isPending, setIsPending] = useState(false);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
-      event.preventDefault();
-      const formData = new FormData(event.currentTarget);
-      const response = await updateProduct(formData, imageURL, product.id);
+      setIsPending(true);
+      if (!product.id) {
+        toast.error("Product ID is required.");
+        setIsPending(false);
+        return;
+      }
+      const response = await updateProduct(data, product.id); // error
       if (response.ok) {
         toast.success("Product updated successfully.");
+        setIsPending(false);
         router.push("/");
         router.refresh();
       } else {
         toast.error("An error occurred. Please try again.");
+        setIsPending(false);
       }
     } catch (error) {
       toast.error(
@@ -58,15 +80,18 @@ const EditForm = ({ product }: { product: productType }) => {
       router.push("/");
     }
   };
+  console.log("form", form.getValues("productsImages"));
 
   return (
-    <div className="mt-2">
+    <div className="w-full p-4">
       <Form {...form}>
         <form
-          onSubmit={handleSubmit}
+          onSubmit={form.handleSubmit(handleSubmit)}
           className="flex flex-col p-2 md:p-5 w-full mx-auto rounded-md max-w-3xl gap-2 border"
         >
-          <h2 className="text-2xl font-bold">Edit product</h2>
+          <h2 className={"text-2xl font-bold"} style={{ color: randomColor }}>
+            Edit product
+          </h2>
           <p className="text-base">
             Please fill the form below to update the product
           </p>
@@ -77,7 +102,9 @@ const EditForm = ({ product }: { product: productType }) => {
               name="productName"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Product name</FormLabel> *
+                  <FormLabel>
+                    Product name <span className="text-red-600">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Enter product name" {...field} />
                   </FormControl>
@@ -90,7 +117,9 @@ const EditForm = ({ product }: { product: productType }) => {
               name="price"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormLabel>Price</FormLabel> *
+                  <FormLabel>
+                    Price <span className="text-red-600">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter product price"
@@ -108,13 +137,24 @@ const EditForm = ({ product }: { product: productType }) => {
             name="categoryId"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Category</FormLabel> *
+                <FormLabel>
+                  Category <span className="text-red-600">*</span>
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Enter category ID"
-                    type="text"
-                    {...field}
-                  />
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.categoryName}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -125,12 +165,16 @@ const EditForm = ({ product }: { product: productType }) => {
             name="productsImages"
             render={({ field }) => (
               <FormItem className="w-full">
-                <FormLabel>Upload file image</FormLabel> *
+                <FormLabel>
+                  Upload file image <span className="text-red-600">*</span>
+                </FormLabel>
                 <FormControl>
                   <UploadFile
-                    files={imageURL}
-                    setImageURL={setImageURL}
-                    field={field}
+                    field={field} // Pass the field object to the UploadFile component
+                    randomColor={randomColor}
+                    isLoadingFile={isLoadingFile}
+                    setIsLoadingFile={setIsLoadingFile}
+                    productImages={product.img} // Pass the product
                   />
                 </FormControl>
                 <FormMessage />
@@ -143,12 +187,20 @@ const EditForm = ({ product }: { product: productType }) => {
             </Button>
 
             <Button
-              className="rounded-lg"
-              type="submit"
+              className="rounded-lg cursor-pointer"
               size="sm"
-              onClick={() => setIsSubmitting(true)}
+              type="submit"
+              variant="submit"
+              disabled={isPending || isLoadingFile} // Disable if form is invalid or pending
             >
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isPending ? (
+                <div>
+                  Updating{" "}
+                  <span className="loading loading-dots loading-xs"></span>
+                </div>
+              ) : (
+                "Update product"
+              )}
             </Button>
           </div>
         </form>

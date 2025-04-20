@@ -10,11 +10,14 @@ import { toast } from "sonner";
 import { imagesTpye } from "@/types/itemTypes";
 import SkeletionImages from "./loading";
 import { CircleX } from "lucide-react";
+import { getProductImages } from "@/app/action/products";
+import { FileListResponse } from "pinata";
 interface UploadFileProps {
   field: any; // Add this line to accept the field object from react-hook-form
   randomColor?: string;
   isLoadingFile: boolean;
   setIsLoadingFile: (value: boolean) => void;
+  productImages?: imagesTpye[];
 }
 
 const UploadFile: React.FC<UploadFileProps> = ({
@@ -22,13 +25,47 @@ const UploadFile: React.FC<UploadFileProps> = ({
   randomColor,
   isLoadingFile,
   setIsLoadingFile,
+  productImages,
 }) => {
   const [files, setFiles] = useState<Array<{ file: File }>>([]);
-
+  const [productUrl, setProductUrl] = useState<
+    Array<{ file: FileListResponse; url: string }>
+  >([]);
+  const handleGetProductImages = async () => {
+    if (!productImages) return null;
+    return await getProductImages(productImages[0].productId);
+  };
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoadingFile(true);
+      const result = await handleGetProductImages(); // Call the function
+      console.log("result", result); // Log the result
+      if (result) {
+        setProductUrl(result); // Set the product URL state
+      }
+      setIsLoadingFile(false);
+    };
+    fetchData();
+  }, [productImages]);
+  useEffect(() => {
+    files.length === 0 ? console.log("aa") : console.log("bb");
+  }, [files]);
   const dropZoneConfig = {
     accept: ["jpg", "jpeg", "png"],
     maxSize: 1024 * 1024 * 10,
   };
+
+  // useEffect(() => {
+  //   if (productImages && productImages.length > 0) {
+  //     setFiles(
+  //       productUrl.map((item) => ({
+  //         file: new File([], item.file.files[0]?.name || "unknown"), // Ensure the name is a string or use a fallback
+  //       }))
+  //     );
+  //   }
+  // }, [productImages]); // Run this effect only when productImages changes
+
+  console.log("files", files); // Log the files state
 
   const handleFileChange = async (file: File) => {
     try {
@@ -49,7 +86,6 @@ const UploadFile: React.FC<UploadFileProps> = ({
       setIsLoadingFile(false);
     }
   };
-
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (files.length + acceptedFiles.length > 6) {
@@ -108,7 +144,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
     });
     const response = await deleteFile.json();
     if (response.error) {
-      toast.error("Error deleting file");
+      toast.error("Error remove file");
       setIsLoadingFile(false);
       return;
     }
@@ -119,6 +155,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
     field.onChange(list);
     setIsLoadingFile(false);
   };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
   return (
@@ -137,11 +174,32 @@ const UploadFile: React.FC<UploadFileProps> = ({
                 Hang tight pls{" "}
                 <span
                   className="loading loading-dots loading-xs"
-                  style={{ color: randomColor }}
+                  style={{ color: randomColor ? randomColor : "#000" }}
                 ></span>
               </div>
-            ) : files.length > 0 ? (
+            ) : (productImages && productImages.length > 0) ||
+              files.length > 0 ? (
               <div className="flex flex-wrap gap-2 mt-4">
+                {productUrl.map((file, index) => (
+                  <div
+                    key={index}
+                    className="relative w-[200px] h-[150px] rounded-md overflow-hidden border border-gray-500 dark:border-gray-500"
+                  >
+                    <Image
+                      src={file.url}
+                      alt="Uploaded image"
+                      fill
+                      className="rounded-md object-cover"
+                      sizes="200px"
+                      quality={100}
+                    />
+                    <CircleX
+                      className="absolute top-1 right-2 cursor-pointer"
+                      style={{ color: randomColor }}
+                      onClick={() => handleRemoveFile(index)}
+                    />
+                  </div>
+                ))}
                 {files.map((file, index) => (
                   <div
                     key={index}

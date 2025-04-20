@@ -185,7 +185,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
               Cancel
             </Button>
             <Button
-              className="rounded-lg"
+              className="rounded-lg cursor-pointer"
               size="sm"
               type="submit"
               variant="submit"

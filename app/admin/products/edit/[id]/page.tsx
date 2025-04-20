@@ -23,12 +23,13 @@ const page = async ({ params }: { params: { id: string } }) => {
       img: true,
     },
   });
+  const categories = await prisma.categories.findMany({});
 
   if (!product) {
     return <div>Product not found</div>;
   }
 
-  return <EditForm product={product} />;
+  return <EditForm product={product} categories={categories} />;
 };
 
 export default page;

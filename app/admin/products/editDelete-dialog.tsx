@@ -50,7 +50,6 @@ export default function EditDeleteDialog({
             aria-labelledby="options-menu"
           >
             <EditFormDialog id={products.id} />
-            <DeleteDialogProduct products={products} />
           </div>
         </div>
       )}

@@ -116,41 +116,74 @@ export async function deleteAllProduct(
     return { ok: false, message: "Failed to delete product" };
   }
 }
-export async function updateProduct(
-  formData: FormData,
-  productsImages: string[] = [],
-  id: string
-) {
-  const productName = formData.get("productName") as string;
-  const price = parseFloat(formData.get("price") as string);
-  const categoryId = formData.get("categoryId") as string;
-  console.log(productName, price, categoryId);
-
-  if (!productName.trim()) {
-    return { ok: false, message: "Product name is required" };
+export async function updateProduct(data: dataType, productId: string) {
+  if (!data) {
+    return { ok: false, message: "Invalid product" };
   }
   try {
-    await prisma.images.deleteMany({
+    const isExist = await prisma.products.findFirst({
       where: {
-        productId: new ObjectId(id).toString(),
+        productName: data.productName,
       },
     });
+    if (isExist) {
+      return { ok: false, message: "Product name already exists" };
+    }
 
-    await prisma.products.update({
+    // Delete old images if any
+    const oldImages = await prisma.images.findMany({
       where: {
-        id: new ObjectId(id).toString(),
+        productId: new ObjectId(productId).toString(),
+      },
+    });
+    if (oldImages.length > 0) {
+      const deleteImages = await prisma.images.deleteMany({
+        where: {
+          productId: new ObjectId(productId).toString(),
+        },
+      });
+      if (deleteImages) {
+        return { ok: false, message: "Failed to delete old images" };
+      }
+    }
+
+    const product = await prisma.products.update({
+      where: {
+        id: new ObjectId(productId).toString(),
       },
       data: {
-        productName: productName,
-        price: price,
-        categoryId: categoryId,
-        // img: {
-        //   create: productsImages.map((url) => ({ // bug here
-        //     cid: url,
-        //   })),
-        // },
+        productName: data.productName,
+        price: data.price,
+        categoryId: data.categoryId, // updated
+        img: {
+          create: data.productsImages.map((cid) => ({
+            url: cid,
+          })),
+        },
       },
     });
+    if (!product) {
+      return { ok: false, message: "Failed create product" };
+    }
+    await Promise.all(
+      oldImages.map(async (image) => {
+        const countImagesWithSameOldImagesUrl = await prisma.images.count({
+          where: {
+            url: image.url,
+            AND: {
+              productId: {
+                not: image.productId,
+              },
+            },
+          },
+        });
+        if (countImagesWithSameOldImagesUrl === 0) {
+          const files = await pinata.files.private.list().cid(image.url);
+          await pinata.files.private.delete([files.files[0].id]);
+        }
+      })
+    );
+
     return { ok: true, message: "Product updated successfully" };
   } catch (error) {
     return { ok: false, message: "Failed to update product" };
@@ -190,23 +223,33 @@ export async function getAllProductsImages() {
     return [];
   }
 }
-export async function getProductImages(productsId: string | undefined) {
-  if (productsId === undefined) {
+export async function getProductImages(productsId: string) {
+  if (!productsId) {
     return null;
   }
   try {
-    const images = await prisma.images.findFirst({
+    const imagesProduct = await prisma.images.findMany({
       where: {
         productId: new ObjectId(productsId).toString(),
       },
     });
-    if (!images) {
+    if (!imagesProduct) {
       return null;
     }
-    const imageUrl = await pinata.gateways.private.createAccessLink({
-      cid: images.url,
-      expires: 30,
-    });
+
+    const imageUrl = await Promise.all(
+      imagesProduct.map(async (images) => {
+        let url = await pinata.gateways.private.createAccessLink({
+          cid: images.url,
+          expires: 30,
+        });
+        let file = await pinata.files.private.list().cid(images.url);
+        return {
+          file: file,
+          url: url,
+        };
+      })
+    );
     return imageUrl;
   } catch (error) {
     console.error("Error getting product images:", error);

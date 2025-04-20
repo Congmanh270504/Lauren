@@ -22,11 +22,11 @@ import {
   setDeleteChecked,
 } from "@/app/state/deleteChecked/deleteChecked";
 import Image from "next/image";
-import { getProductImages } from "@/app/action/products";
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 import { AppDispatch, RootState } from "@/app/state/store";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 export const columnsProducts: ColumnDef<productType>[] = [
   {
@@ -203,7 +203,11 @@ export const columnsProducts: ColumnDef<productType>[] = [
               Copy category ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Edit category details</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/admin/products/edit/${product.id}`}>
+                Edit category details
+              </Link>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
