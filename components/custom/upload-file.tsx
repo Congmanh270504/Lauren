@@ -18,6 +18,7 @@ interface UploadFileProps {
   isLoadingFile: boolean;
   setIsLoadingFile: (value: boolean) => void;
   productImages?: imagesTpye[];
+  isSubmit: boolean;
 }
 
 const UploadFile: React.FC<UploadFileProps> = ({
@@ -26,6 +27,7 @@ const UploadFile: React.FC<UploadFileProps> = ({
   isLoadingFile,
   setIsLoadingFile,
   productImages,
+  isSubmit,
 }) => {
   const [files, setFiles] = useState<Array<{ file: File }>>([]);
   const [productUrl, setProductUrl] = useState<
@@ -40,20 +42,21 @@ const UploadFile: React.FC<UploadFileProps> = ({
       setIsLoadingFile(true);
       const result = await handleGetProductImages(); // Call the function
       if (result) {
-        setProductUrl(result); 
+        setProductUrl(result);
         setFiles(
           result.map((item) => ({
-            file: new File([], item.file.files[0]?.name || "unknown"), 
+            file: new File([], item.file.files[0]?.name || "unknown"),
           }))
         );
       }
       setIsLoadingFile(false);
     };
     fetchData();
-  }, [productImages]); 
+  }, [productImages]);
 
   useEffect(() => {
     console.log("Updated files:", files); // Log the updated files state
+    console.log("filed", field.value.length); // Log the field value
   }, [files]); // Run this effect whenever `files` changes
 
   const dropZoneConfig = {
@@ -121,28 +124,21 @@ const UploadFile: React.FC<UploadFileProps> = ({
         ...prevFiles,
         ...validFiles.map((file) => ({ file })),
       ]);
+      field.onChange([
+        ...(field.value as string[]),
+        ...validFiles.map((file) => file.name),
+      ]); // Update the form field with the current file names
 
       // Trigger file upload for valid files
-      validFiles.forEach((file) => handleFileChange(file));
+      if (isSubmit) {
+        field.onChange([]);
+        validFiles.forEach((file) => handleFileChange(file));
+      }
     },
     [files]
   );
   const handleRemoveFile = async (index: number) => {
     setIsLoadingFile(true);
-    const deleteFile = await fetch("/api/deleteFile", {
-      method: "DELETE",
-      body: JSON.stringify({ fileName: files[index].file.name }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const response = await deleteFile.json();
-    if (response.error) {
-      toast.error("Error remove file");
-      setIsLoadingFile(false);
-      return;
-    }
-    toast.success("File remove successfully");
     setFiles((prev) => prev.filter((_, i) => i !== index));
     const list = field.value as string[]; // Get the current value of the field
     list.splice(index, 1);
@@ -239,14 +235,14 @@ const UploadFile: React.FC<UploadFileProps> = ({
           </div>
         )}
       </div>
-      <Input
+      {/* <Input
         {...getInputProps()}
         id="productsImages"
         name="productsImages"
         type="file"
         className="hidden"
         disabled={isLoadingFile}
-      />
+      /> */}
     </div>
   );
 };

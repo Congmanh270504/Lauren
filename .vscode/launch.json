@@ -1,35 +1,94 @@
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "name": "Launch Chrome",
+//       "request": "launch",
+//       "type": "chrome",
+//       "url": "http://localhost:3000",
+//       "webRoot": "${workspaceFolder}"
+//     },
+//     {
+//       "name": "Next.js: debug client-side",
+//       "type": "chrome",
+//       "request": "launch",
+//       "url": "http://localhost:3000",
+//       "webRoot": "${workspaceFolder}",
+//       "sourceMaps": true,
+//       "skipFiles": ["node_modules/**"]
+//     },
+//     {
+//       "name": "Next.js: debug server-side",
+//       "type": "node",
+//       "request": "launch",
+//       "runtimeExecutable": "npm",
+//       "runtimeArgs": ["run", "dev"],
+//       "port": 9229,
+//       "console": "integratedTerminal",
+//       "sourceMaps": true,
+//       "skipFiles": ["<node_internals>/**", "node_modules/**"],
+//       "env": {
+//         "NODE_ENV": "development"
+//       }
+//     }
+//   ]
+// }
 {
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Chrome",
-      "request": "launch",
-      "type": "chrome",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}"
-    },
-    {
-      "name": "Next.js: debug client-side",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:3000",
-      "webRoot": "${workspaceFolder}",
-      "sourceMaps": true,
-      "skipFiles": ["node_modules/**"]
-    },
-    {
       "name": "Next.js: debug server-side",
       "type": "node",
       "request": "launch",
+      "cwd": "${workspaceFolder}",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
-      "port": 9229,
-      "console": "integratedTerminal",
-      "sourceMaps": true,
-      "skipFiles": ["<node_internals>/**", "node_modules/**"],
-      "env": {
-        "NODE_ENV": "development"
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMapPathOverrides": {
+        "webpack:///./~/*": "${workspaceFolder}/node_modules/*",
+        "webpack://?:*/*": "${workspaceFolder}/*",
+        // Temporary Turbopack path
+        "/turbopack/[project]/*": "${workspaceFolder}/*",
+        // Eventual Turbopack path
+        "turbopack://[project]/*": "${workspaceFolder}/*"
       }
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Next.js: debug client-side",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "/turbopack/[project]/*": "${webRoot}/*",
+        "webpack://nextjs-app-14/./*": "${workspaceFolder}/*",
+        "webpack://_N_E/./*": "${workspaceFolder}/*"
+      },
+      "skipFiles": [
+        "<node_internals>/**",
+        "${workspaceFolder}/node_modules/**",
+        "**/next/dist/**",
+        "**/webpack/**"
+      ],
+      "resolveSourceMapLocations": [
+        "!**/node_modules/**",
+        "!**/tensorflow/**",
+        "!**/hot-reloader-client*",
+        "!**/runtime-backend-dom*",
+        "!**/turbopack/dev/runtime/**"
+      ],
+      "trace": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Next.js: debug full stack",
+      "configurations": [
+        "Next.js: debug server-side",
+        "Next.js: debug client-side"
+      ],
+      "stopAll": true
     }
   ]
 }

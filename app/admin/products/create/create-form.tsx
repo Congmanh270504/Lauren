@@ -49,10 +49,11 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
     },
   });
   const [isPending, setIsPending] = useState(false);
-
+  const [isSubmit, setIsSubmit] = useState(false);
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsPending(true);
+      setIsSubmit(true);
       const response = await createProduct(data);
       if (response.ok) {
         toast.success(response.message);
@@ -61,12 +62,16 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
       } else {
         toast.error(response.message);
       }
+      setIsSubmit(false);
       setIsPending(false);
     } catch (error) {
       toast.error("Failed to create product");
     }
   };
   console.log("form", form.getValues("productsImages"));
+  useEffect(() => {
+    console.log("submit", isSubmit);
+  });
   return (
     <div className="w-full p-4">
       <Form {...form}>
@@ -174,6 +179,7 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
                     randomColor={randomColor}
                     isLoadingFile={isLoadingFile}
                     setIsLoadingFile={setIsLoadingFile}
+                    isSubmit={isSubmit}
                   />
                 </FormControl>
                 <FormMessage />
