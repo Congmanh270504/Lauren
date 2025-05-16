@@ -1,5 +1,6 @@
 import { NextAuthOptions, Session } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+import FacebookProvider from "next-auth/providers/facebook";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/utils/prisma";
 import clientPromise from "./mongodbClient";
@@ -25,13 +26,20 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
     }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_ID as string,
+      clientSecret: process.env.FACEBOOK_SECRET as string,
+    }),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
         const client = await clientPromise;
         const db = client.db() as any;
         const bcrypt = require("bcryptjs");
@@ -54,7 +62,10 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      if (account && (account.provider === "github" || account.provider === "google")) {
+      if (
+        account &&
+        (account.provider === "github" || account.provider === "facebook")
+      ) {
         const client = await clientPromise;
         const db = client.db();
 
@@ -68,9 +79,11 @@ export const authOptions: NextAuthOptions = {
           await db.collection("Users").insertOne({
             name: profile?.name || (profile as any)?.login || "Unknown",
             email: profile?.email || "Unknown",
-            image: (profile as any)?.picture || (profile as any)?.avatar_url || "",
+            image:
+              (profile as any)?.picture || (profile as any)?.avatar_url || "",
             provider: account.provider,
             createdAt: new Date(),
+            updateAt: new Date(),
           });
         }
       }

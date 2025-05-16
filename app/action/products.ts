@@ -101,13 +101,35 @@ export async function deleteAllProduct(
     });
 
     const cidImages = selectImages.flat().map((url) => url.url);
+    // const deleteFilesPinata = await Promise.all(
+    //   cidImages.map(async (cid) => {
+    //     const files = await pinata.files.private.list().cid(cid);
+    //     return files.files[0].id;
+    //   })
+    // );
+    // await pinata.files.private.delete(deleteFilesPinata);
     const deleteFilesPinata = await Promise.all(
       cidImages.map(async (cid) => {
-        const files = await pinata.files.private.list().cid(cid);
-        return files.files[0].id;
+        try {
+          const files = await pinata.files.private.list().cid(cid);
+          if (files.files.length > 0) {
+            return files.files[0].id; // Return the file ID if it exists
+          } else {
+            console.warn(`File with CID ${cid} does not exist.`);
+            return null; // Skip deletion if the file doesn't exist
+          }
+        } catch (error) {
+          console.error(`Error checking file with CID ${cid}:`, error);
+          return null; // Skip deletion if there's an error
+        }
       })
     );
-    await pinata.files.private.delete(deleteFilesPinata);
+
+    // Filter out null values before deletion
+    const validFileIds = deleteFilesPinata.filter((id) => id !== null);
+    if (validFileIds.length > 0) {
+      await pinata.files.private.delete(validFileIds);
+    }
     return {
       ok: true,
       message: "Product deleted successfully",

@@ -88,6 +88,12 @@ export const columnsProducts: ColumnDef<productType>[] = [
             alt=""
             loading="lazy"
             className="w-full h-full object-cover rounded-xl"
+            onLoad={() => (
+              <span className="loading loading-spinner loading-xl"></span>
+            )}
+            onError={() => (
+              <span className="loading loading-spinner loading-xl"></span>
+            )}
           />
         </span>
       ) : (

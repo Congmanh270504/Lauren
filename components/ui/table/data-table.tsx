@@ -150,6 +150,7 @@ export function DataTable<TData, TValue>({
                     <DeleteDialogProduct
                       setIsPending={setIsPending}
                       handleProgress={handleProgress}
+                      table={table}
                     />
                   ) : (
                     <Button variant={"destructive"} className="ml-auto my-1">

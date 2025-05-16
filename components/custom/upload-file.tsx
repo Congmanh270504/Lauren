@@ -18,7 +18,8 @@ interface UploadFileProps {
   isLoadingFile: boolean;
   setIsLoadingFile: (value: boolean) => void;
   productImages?: imagesTpye[];
-  isSubmit: boolean;
+  files: Array<{ file: File }>;
+  setFiles: React.Dispatch<React.SetStateAction<Array<{ file: File }>>>;
 }
 
 const UploadFile: React.FC<UploadFileProps> = ({
@@ -27,9 +28,9 @@ const UploadFile: React.FC<UploadFileProps> = ({
   isLoadingFile,
   setIsLoadingFile,
   productImages,
-  isSubmit,
+  files,
+  setFiles,
 }) => {
-  const [files, setFiles] = useState<Array<{ file: File }>>([]);
   const [productUrl, setProductUrl] = useState<
     Array<{ file: FileListResponse; url: string }>
   >([]);
@@ -55,7 +56,10 @@ const UploadFile: React.FC<UploadFileProps> = ({
   }, [productImages]);
 
   useEffect(() => {
-    console.log("Updated files:", files); // Log the updated files state
+    console.log(
+      "Updated files:",
+      files.map((file) => file.file.name)
+    ); // Log the updated files state
     console.log("filed", field.value.length); // Log the field value
   }, [files]); // Run this effect whenever `files` changes
 
@@ -64,25 +68,6 @@ const UploadFile: React.FC<UploadFileProps> = ({
     maxSize: 1024 * 1024 * 10,
   };
 
-  const handleFileChange = async (file: File) => {
-    try {
-      setIsLoadingFile(true);
-      const data = new FormData();
-      data.set("file", file);
-      const uploadFile = await fetch("/api/uploadFiles", {
-        method: "POST",
-        body: data,
-      });
-      const response = await uploadFile.json();
-      let list = field.value as string[]; // Get the current value of the field
-      list.push(response.cid); // Add the new cid to the list
-      field.onChange(list); // Update the form field with the current cid array
-      setIsLoadingFile(false);
-    } catch (error) {
-      toast.error("Error uploading file");
-      setIsLoadingFile(false);
-    }
-  };
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (files.length + acceptedFiles.length > 6) {
@@ -128,12 +113,6 @@ const UploadFile: React.FC<UploadFileProps> = ({
         ...(field.value as string[]),
         ...validFiles.map((file) => file.name),
       ]); // Update the form field with the current file names
-
-      // Trigger file upload for valid files
-      if (isSubmit) {
-        field.onChange([]);
-        validFiles.forEach((file) => handleFileChange(file));
-      }
     },
     [files]
   );
@@ -235,14 +214,14 @@ const UploadFile: React.FC<UploadFileProps> = ({
           </div>
         )}
       </div>
-      {/* <Input
+      <Input
         {...getInputProps()}
         id="productsImages"
         name="productsImages"
         type="file"
         className="hidden"
         disabled={isLoadingFile}
-      /> */}
+      />
     </div>
   );
 };

@@ -35,6 +35,9 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
   const router = useRouter();
   const [randomColor, setRadomColort] = useState<string>("");
   const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const [isPending, setIsPending] = useState(false);
+  const [files, setFiles] = useState<Array<{ file: File }>>([]);
+
   useEffect(() => {
     setRadomColort(getRandomColor());
   }, []);
@@ -48,12 +51,32 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
       productsImages: [],
     },
   });
-  const [isPending, setIsPending] = useState(false);
-  const [isSubmit, setIsSubmit] = useState(false);
+
+  const handleFileChange = async (file: File) => {
+    try {
+      const data = new FormData();
+      data.set("file", file);
+      const uploadFile = await fetch("/api/uploadFiles", {
+        method: "POST",
+        body: data,
+      });
+      const response = await uploadFile.json();
+      setIsLoadingFile(false);
+      return response.cid;
+    } catch (error) {
+      toast.error("Error uploading file");
+    }
+  };
+
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     try {
       setIsPending(true);
-      setIsSubmit(true);
+      const uploadedCids = await Promise.all(
+        files.map((file) => handleFileChange(file.file))
+      );
+      // Assign the uploaded CIDs to productsImages
+      data.productsImages = uploadedCids;
+
       const response = await createProduct(data);
       if (response.ok) {
         toast.success(response.message);
@@ -62,16 +85,16 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
       } else {
         toast.error(response.message);
       }
-      setIsSubmit(false);
       setIsPending(false);
     } catch (error) {
       toast.error("Failed to create product");
     }
   };
   console.log("form", form.getValues("productsImages"));
-  useEffect(() => {
-    console.log("submit", isSubmit);
-  });
+
+  // useEffect(() => {
+  //   console.log("submit", isSubmit);
+  // });
   return (
     <div className="w-full p-4">
       <Form {...form}>
@@ -179,7 +202,8 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
                     randomColor={randomColor}
                     isLoadingFile={isLoadingFile}
                     setIsLoadingFile={setIsLoadingFile}
-                    isSubmit={isSubmit}
+                    setFiles={setFiles}
+                    files={files}
                   />
                 </FormControl>
                 <FormMessage />

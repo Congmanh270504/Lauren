@@ -22,10 +22,12 @@ import { useRouter } from "next/navigation";
 interface DeleteDialogProductProps {
   setIsPending: (isPending: boolean) => void;
   handleProgress: () => void;
+  table: any;
 }
 export default function DeleteDialogProduct({
   setIsPending,
   handleProgress,
+  table
 }: DeleteDialogProductProps) {
   const deleteChecked = useSelector((state: RootState) => state.deleteChecked);
   const dispatch = useDispatch<AppDispatch>();
@@ -39,6 +41,7 @@ export default function DeleteDialogProduct({
       if (response && response.ok) {
         toast.success("Delete product has been successfully");
         dispatch(clearDeleteChecked());
+        table.toggleAllPageRowsSelected(false);
       } else {
         toast.error("Delete product has not been failed");
       }
@@ -48,6 +51,17 @@ export default function DeleteDialogProduct({
       toast.error("Event has not been created");
     }
   };
+  // const handleDeleteAllProduct = async () => {
+  //   try {
+  //     setIsPending(true);
+  //     handleProgress();
+  //     const response = await deleteAllProduct(deleteChecked);
+  //     console.log("response", response);
+  //     setIsPending(false);
+  //   } catch (error) {
+  //     toast.error("Event has not been created");
+  //   }
+  // };
   return (
     <Dialog>
       <DialogTrigger asChild>

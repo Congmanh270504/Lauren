@@ -22,6 +22,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { FaGithub } from "react-icons/fa";
+import { FaFacebook } from "react-icons/fa6";
 import { TypographyH4 } from "@/components/ui/typography";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -38,6 +39,7 @@ export default function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"form">) {
+  const [isPending, setIsPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,16 +52,22 @@ export default function LoginForm({
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsPending(true);
       const res = await signIn("credentials", {
         ...values,
         redirect: false,
+        email: values.email,
+        password: values.password,
       });
-      if (res) {
+      if (res?.error) {
+        // If there's an error with authentication
+        toast.error("Login failed. Please try again.");
+      } else {
+        // On successful login, redirect to the homepage
         toast.success("Login successful!");
         router.push("/");
-      } else {
-        toast.error("Login failed. Please try again.");
       }
+      setIsPending(true);
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
@@ -86,8 +94,13 @@ export default function LoginForm({
           <Button
             variant="outline"
             className="w-full h-12 text-base font-medium border-2"
+            onClick={() => {
+              signIn("facebook", {
+                callbackUrl: "/",
+              });
+            }}
           >
-            <FaGoogle /> Login with Google
+            <FaFacebook /> Login with Facebook
           </Button>
           <Button
             variant="outline"
@@ -175,12 +188,22 @@ export default function LoginForm({
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            className="w-full h-12 text-lg font-medium mt-2"
-          >
-            Login
-          </Button>
+          {isPending ? (
+            <Button
+              type="submit"
+              className="w-full h-12 text-lg font-medium mt-2"
+              disabled
+            >
+              Login <span className="loading loading-dots loading-lg"></span>
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              className="w-full h-12 text-lg font-medium mt-2"
+            >
+              Login
+            </Button>
+          )}
         </div>
         <div className="text-center text-base mt-2">
           Don&apos;t have an account?{" "}

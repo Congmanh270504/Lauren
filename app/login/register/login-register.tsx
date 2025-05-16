@@ -20,6 +20,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const formSchema = z
   .object({
@@ -57,9 +58,10 @@ export default function LoginRegister({
     },
   });
   const router = useRouter();
-
+  const [isPending, setIsPending] = useState(false);
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      setIsPending(true);
       const response = await fetch("/api/auth/register", {
         method: "POST",
         body: JSON.stringify(values),
@@ -80,6 +82,7 @@ export default function LoginRegister({
       toast.success(data.success);
       router.push("/login/sign-in");
       form.reset();
+      setIsPending(true);
     } catch (error) {
       console.error("Form submission error", error);
       toast.error("Failed to submit the form. Please try again.");
@@ -186,12 +189,22 @@ export default function LoginRegister({
               </FormItem>
             )}
           />
-          <Button
-            type="submit"
-            className="cursor-pointer w-full h-12 text-lg font-medium mt-2 bg-black text-white hover:bg-gray-800 transition-colors duration-200"
-          >
-            Register
-          </Button>
+          {isPending ? (
+            <Button
+              type="submit"
+              className="w-full h-12 text-lg font-medium mt-2"
+              disabled
+            >
+              Register <span className="loading loading-dots loading-lg"></span>
+            </Button>
+          ) : (
+            <Button
+              type="submit"
+              className="cursor-pointer w-full h-12 text-lg font-medium mt-2 bg-black text-white hover:bg-gray-800 transition-colors duration-200"
+            >
+              Register
+            </Button>
+          )}
         </div>
         <div className="text-center text-base mt-2">
           Already have an account?{" "}
