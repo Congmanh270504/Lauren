@@ -1,23 +1,19 @@
 "use client";
-
-// import * as React from "react";
-
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "@/app/state/store";
-import { fetchInitialImages } from "../state/images/images";
-import { Progress } from "@/components/ui/progress";
-import { prisma } from "@/utils/prisma";
-import { Button } from "@/components/ui/button";
-import { getProductImages } from "@/app/action/products";
-import { pinata } from "@/utils/config";
+import MusicPlayer from "./music-player";
 import Image from "next/image";
+import React, { useEffect } from "react";
+import Comment from "./comment";
 
-export default function DemoPage() {
-
+export default function Home() {
   return (
-    <>
-      <div>
-      </div>
-    </>
+    <div className="flex h-full p-4 bg-red-700 gap-2">
+      <MusicPlayer
+        title="What's the Move"
+        artist="Young Thug feat. Lil Uzi Vert"
+        albumArt="/twice.jfif"
+        audioSrc="/1.mp3"
+      />
+      <Comment />
+    </div>
   );
 }
