@@ -1,19 +1,11 @@
-"use client";
-
-import { useState } from "react";
-import { HorizontalVolumeControl } from "./horizontal-volume-control";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { CommentSection } from "./comment-section";
 
 export default function Home() {
   return (
-    <div className="relative mt-10">
-      <div className="absolute top-[-5em] right-[15px] w-1/4">fdasfdas</div>
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-gray-50">
+      <div className="w-full max-w-md bg-white rounded-lg shadow">
+        <CommentSection />
+      </div>
+    </main>
   );
 }

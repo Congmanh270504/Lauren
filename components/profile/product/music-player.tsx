@@ -19,8 +19,8 @@ import { Repeat1 } from "lucide-react";
 import { GrChapterNext } from "react-icons/gr";
 import { GrChapterPrevious } from "react-icons/gr";
 import { FaHeart } from "react-icons/fa";
-import { HorizontalVolumeControl } from "@/app/test/horizontal-volume-control";
 import { Volume, Volume1, Volume2, VolumeX } from "lucide-react";
+import { HorizontalVolumeControl } from "@/components/custom/horizontal-volume-control";
 
 interface MusicPlayerProps {
   title: string;

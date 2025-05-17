@@ -1,3 +1,4 @@
+import { CommentSection } from "@/app/test/comment-section";
 import React from "react";
 
 const Comment = () => {
@@ -7,7 +8,9 @@ const Comment = () => {
         play list
       </div>
       <div className="h-1/2 overflow-hidden shadow-lg border border-gray-100 rounded-lg">
-        comment area
+        <div className="w-full h-full relative bg-white rounded-lg shadow">
+          <CommentSection />
+        </div>
       </div>
     </div>
   );

@@ -13,33 +13,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Products {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  productName String   @unique
-  price       Float
-  categoryId  String   @db.ObjectId
-  Category    Categories @relation(fields: [categoryId], references: [id])
-  img         Images[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Genre{
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  Songs Songs[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-model Categories {
-  id           String     @id @default(auto()) @map("_id") @db.ObjectId
-  categoryName String     @unique
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  Products     Products[]
+model Songs {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  GenreId String @db.ObjectId
+  artistId String @db.ObjectId
+  playlistId String @db.ObjectId @default("")
+  commentId String @db.ObjectId @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Comments Comments[]
+  Genre Genre @relation(fields: [GenreId], references: [id])
+  Artists Artists @relation(fields: [artistId], references: [id])
+  Playlists Playlists @relation(fields: [playlistId], references: [id])
+  Wishlist Wishlist[]
+}
+
+model Artists {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name String @unique
+  bio String @default("")
+  country String @default("")
+  debutYear String @default("")
+  imageId String @unique @db.ObjectId @default("")
+  followId String @db.ObjectId @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Follows Follows[] 
+  image Images @relation(fields: [imageId], references: [id])
+  Songs Songs[]
 }
 
 model Images {
   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  productId  String   @db.ObjectId
-  Products   Products @relation(fields: [productId], references: [id], onDelete: Cascade)
+  artistId   String   @db.ObjectId
+  Artists    Artists?
   url        String
+  Users      Users?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
 model Users {
   id    String @id @default(auto()) @map("_id") @db.ObjectId
   email String @unique
@@ -49,6 +71,55 @@ model Users {
   phone String @unique @default("")
   address String @default("")
   provider String @default("")
+  imageId String @unique @db.ObjectId @default("")
+  wishlistId String @db.ObjectId @default("")
+  commentId String @db.ObjectId @default("")
+  followId String @db.ObjectId @default("")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  Follows Follows[]
+  Comments Comments[]
+  image Images @relation(fields: [imageId], references: [id])
+  Wishlist Wishlist[]
+  Playlists Playlists[]
+}
+
+model Playlists {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  description String @default("")
+  userId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users Users @relation(fields: [userId], references: [id])
+  Songs Songs[]
+}
+
+model Wishlist {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  songId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users Users @relation(fields: [userId], references: [id])
+  Songs Songs @relation(fields: [songId], references: [id])
+}
+model Comments {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  songId String @db.ObjectId
+  comment String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users Users @relation(fields: [userId], references: [id])
+  Songs Songs @relation(fields: [songId], references: [id])
+}
+model Follows {
+  id    String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  artistId String @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users Users @relation(fields: [userId], references: [id])
+  Artists Artists @relation(fields: [artistId], references: [id])
 }
