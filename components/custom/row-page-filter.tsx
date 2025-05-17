@@ -94,7 +94,7 @@ const RowPageFilter = ({ data, numberItems, setItem }: RowPageFilterProps) => {
             <span className="sr-only">Previous</span>
             <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
-          <span className="text-sm text-gray-700 content-center mx-[1rem]">
+          <span className="text-sm text-gray-700 content-center mx-4">
             Page {setting.page}
           </span>
           <button

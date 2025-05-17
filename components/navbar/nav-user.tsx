@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/sidebar";
 import { FaUser } from "react-icons/fa";
 import { signOut, useSession } from "next-auth/react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 
 export function NavUser() {
   const { isMobile } = useSidebar();

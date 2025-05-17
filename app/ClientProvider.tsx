@@ -2,7 +2,7 @@
 import { Provider } from "react-redux";
 import { store } from "./state/store";
 import { Toaster } from "sonner";
-import { AppSidebar } from "@/components/app-sidebar";
+import { AppSidebar } from "@/components/navbar/app-sidebar";
 import {
   Breadcrumb,
   BreadcrumbItem,

@@ -401,7 +401,7 @@ const MultiSelectContent = React.forwardRef<
       >
         <Command
           className={cn(
-            "px-1 max-h-96 w-full min-w-[var(--radix-select-trigger-width)]",
+            "px-1 max-h-96 w-full min-w-(--radix-select-trigger-width)",
             className
           )}
           shouldFilter={!context.onSearch}

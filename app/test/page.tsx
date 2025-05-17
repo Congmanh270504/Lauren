@@ -1,19 +1,19 @@
 "use client";
-import MusicPlayer from "./music-player";
-import Image from "next/image";
-import React, { useEffect } from "react";
-import Comment from "./comment";
+
+import { useState } from "react";
+import { HorizontalVolumeControl } from "./horizontal-volume-control";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function Home() {
   return (
-    <div className="flex h-full p-4 bg-red-700 gap-2">
-      <MusicPlayer
-        title="What's the Move"
-        artist="Young Thug feat. Lil Uzi Vert"
-        albumArt="/twice.jfif"
-        audioSrc="/1.mp3"
-      />
-      <Comment />
+    <div className="relative mt-10">
+      <div className="absolute top-[-5em] right-[15px] w-1/4">fdasfdas</div>
     </div>
   );
 }
