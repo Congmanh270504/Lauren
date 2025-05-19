@@ -89,6 +89,31 @@ export default function MusicPlayer({
     setIsPlaying(!isPlaying);
   };
 
+  const handleForward10s = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const newTime = Math.min(audio.currentTime + 10, audio.duration || 0);
+    audio.currentTime = newTime;
+    audio.play().catch((error) => {
+      console.error("Error playing audio:", error);
+    });
+    setIsPlaying(true);
+    setCurrentTime(newTime);
+  };
+
+  const handleBackward10s = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.currentTime === 0) return; // Prevent going negative
+    const newTime = Math.max(audio.currentTime - 10, 0);
+    audio.currentTime = newTime;
+    audio.play().catch((error) => {
+      console.error("Error playing audio:", error);
+    });
+    setIsPlaying(true);
+    setCurrentTime(newTime);
+  };
+
   const handleProgressChange = (value: number[]) => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -175,7 +200,7 @@ export default function MusicPlayer({
             <Button>
               <GrChapterPrevious />
             </Button>
-            <Button>
+            <Button onClick={handleBackward10s}>
               <SkipBack size={24} />
             </Button>
             <Button
@@ -184,7 +209,7 @@ export default function MusicPlayer({
             >
               {isPlaying ? <Pause size={24} /> : <Play size={24} />}
             </Button>
-            <Button>
+            <Button onClick={handleForward10s}>
               <SkipForward size={24} />
             </Button>
             <Button>
@@ -226,7 +251,7 @@ export default function MusicPlayer({
       </div>
 
       {/* Hidden Audio Element */}
-      <audio ref={audioRef} src={audioSrc} />
+      <audio ref={audioRef} src={audioSrc} loop={isRepeatOne} />
     </div>
   );
 }

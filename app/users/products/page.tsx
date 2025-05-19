@@ -1,5 +1,5 @@
 "use client";
-import Comment from "@/components/profile/product/comment";
+import PlaylistComment from "@/components/profile/product/playlist-comment";
 import MusicPlayer from "@/components/profile/product/music-player";
 import Image from "next/image";
 import React, { useEffect } from "react";
@@ -13,7 +13,7 @@ export default function Home() {
         albumArt="/twice.jfif"
         audioSrc="/What-is-love.mp3"
       />
-      <Comment />
+      <PlaylistComment />
     </div>
   );
 }

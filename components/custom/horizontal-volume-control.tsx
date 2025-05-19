@@ -92,10 +92,8 @@ export function HorizontalVolumeControl({
       </div>
 
       {isControlVisible && (
-        <div
-          className="absolute top-[-5em] right-[15px] w-1/4 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-800 z-10"
-        >
-          <div className="flex flex-col items-center gap-2">
+        <div className="absolute top-[-5em] right-[15px] w-1/4 mb-2 bg-white dark:bg-gray-900 rounded-lg shadow-lg p-4 border border-gray-200 dark:border-gray-800 z-10">
+          <div className="flex justify-between items-center gap-2 ">
             <Slider
               value={[isMuted ? 0 : volume]}
               min={0}
@@ -106,7 +104,7 @@ export function HorizontalVolumeControl({
               className="h-full"
               aria-label="Volume Control"
             />
-            <span className="text-xs text-muted-foreground mt-1">
+            <span className="text-xs text-muted-foreground mt-1 font-bold">
               {isMuted ? "Muted" : `${volume}%`}
             </span>
           </div>

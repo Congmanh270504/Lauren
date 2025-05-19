@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Heart, MessageCircle, Send, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut, useSession } from "next-auth/react";
+import BookmarkIcon from "@/components/custom/icon/bookmark-icon";
 
 type Comment = {
   id: string;
@@ -74,6 +76,25 @@ const initialComments: Comment[] = [
     timeAgo: "1d",
     replies: [],
   },
+  {
+    id: "6",
+    username: "lareine.art",
+    avatarUrl: "/placeholder.svg?height=40&width=40",
+    content:
+      " fhkjadsfhjkadslkfasdkjhfklasdkflasdkfjaldks fhjkasdfhaskjdhflaasdkjhflasdkf fhkjadsfhjkadslkfasdkjhfklasdkflasdkfjaldksfhjkasdfhaskjdhflaasdkjhflasdkf",
+    likes: 3,
+    timeAgo: "1d",
+    replies: [],
+  },
+  {
+    id: "7",
+    username: "lareine.art",
+    avatarUrl: "/placeholder.svg?height=40&width=40",
+    content: "❤️ ❤️",
+    likes: 3,
+    timeAgo: "1d",
+    replies: [],
+  },
 ];
 
 export function CommentSection() {
@@ -83,6 +104,7 @@ export function CommentSection() {
   );
   const [newComment, setNewComment] = useState("");
   const commentInputRef = useRef<HTMLInputElement>(null);
+  const { data: session } = useSession();
 
   const toggleReplies = (commentId: string) => {
     setExpandedComments((prev) => {
@@ -120,15 +142,31 @@ export function CommentSection() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col gap-2 w-full h-full">
       {/* Post header */}
       <div className="flex items-center p-4 border-b">
         <Avatar className="h-8 w-8 mr-2">
           <img src="/placeholder.svg?height=32&width=32" alt="Profile" />
         </Avatar>
-        <div className="flex items-center">
+        <div className="flex items-center gap-1">
           <span className="font-semibold">sontungmtp</span>
-          <span className="ml-1 text-blue-500">•</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            x="0px"
+            y="0px"
+            width="20"
+            height="20"
+            viewBox="0 0 48 48"
+          >
+            <polygon
+              fill="#42a5f5"
+              points="29.62,3 33.053,8.308 39.367,8.624 39.686,14.937 44.997,18.367 42.116,23.995 45,29.62 39.692,33.053 39.376,39.367 33.063,39.686 29.633,44.997 24.005,42.116 18.38,45 14.947,39.692 8.633,39.376 8.314,33.063 3.003,29.633 5.884,24.005 3,18.38 8.308,14.947 8.624,8.633 14.937,8.314 18.367,3.003 23.995,5.884"
+            ></polygon>
+            <polygon
+              fill="#fff"
+              points="21.396,31.255 14.899,24.76 17.021,22.639 21.428,27.046 30.996,17.772 33.084,19.926"
+            ></polygon>
+          </svg>
           <span className="ml-1 text-blue-500 font-medium">Follow</span>
         </div>
         <Button variant="ghost" size="icon" className="ml-auto">
@@ -137,11 +175,11 @@ export function CommentSection() {
       </div>
 
       {/* Comments section */}
-      <div className="max-h-96 overflow-y-auto p-4">
+      <div className="h-10 grow overflow-y-auto p-2 ">
         {comments.map((comment) => (
           <div key={comment.id} className="mb-4">
             <div className="flex">
-              <Avatar className="h-8 w-8 mr-2 flex-shrink-0">
+              <Avatar className="h-8 w-8 flex-shrink-0">
                 <img
                   src={comment.avatarUrl || "/placeholder.svg"}
                   alt={comment.username}
@@ -151,7 +189,9 @@ export function CommentSection() {
                 <div className="flex flex-col">
                   <div>
                     <span className="font-semibold">{comment.username}</span>{" "}
-                    <span>{comment.content}</span>
+                    <span style={{ wordBreak: "break-word" }}>
+                      {comment.content}
+                    </span>
                   </div>
                   <div className="flex items-center mt-1 text-xs text-gray-500">
                     <span>{comment.timeAgo}</span>
@@ -183,7 +223,6 @@ export function CommentSection() {
               </Button>
             </div>
 
-            {/* View/Hide replies button */}
             {comment.replies && comment.replies.length > 0 && (
               <Button
                 variant="ghost"
@@ -202,7 +241,6 @@ export function CommentSection() {
               </Button>
             )}
 
-            {/* Replies */}
             {expandedComments.has(comment.id) && comment.replies && (
               <div className="ml-10 mt-2">
                 {comment.replies.map((reply) => (
@@ -219,7 +257,7 @@ export function CommentSection() {
                           <span className="font-semibold">
                             {reply.username}
                           </span>{" "}
-                          <span>{reply.content}</span>
+                          <span className="p-2">{reply.content}</span>
                         </div>
                         <div className="flex items-center mt-1 text-xs text-gray-500">
                           <span>{reply.timeAgo}</span>
@@ -251,7 +289,7 @@ export function CommentSection() {
       </div>
 
       {/* Post actions */}
-      <div className="absolute bottom-0 left-0 right-0 bg-white shadow-lg">
+      <div className=" bg-white shadow-lg mt-auto">
         <div className="p-4 border-t">
           <div className="flex items-center mb-3">
             <Button variant="ghost" size="icon">
@@ -260,27 +298,10 @@ export function CommentSection() {
             <Button variant="ghost" size="icon" onClick={focusCommentInput}>
               <MessageCircle className="h-6 w-6" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" onClick={handleAddComment}>
               <Send className="h-6 w-6" />
             </Button>
-            <Button variant="ghost" size="icon" className="ml-auto">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-6 w-6"
-              >
-                <path d="M19 21 5 21a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
-                <polyline points="17 21 17 13 7 13 7 21" />
-                <polyline points="7 3 7 8 15 8" />
-              </svg>
-            </Button>
+            <BookmarkIcon size={24} />
           </div>
           <div className="text-sm font-semibold mb-1">
             Liked by <span className="font-semibold">_ttruc.niiiii_</span> and{" "}
@@ -289,10 +310,17 @@ export function CommentSection() {
           <div className="text-xs text-gray-500 mb-3">1 day ago</div>
         </div>
 
-        {/* Add comment */}
-        <div className="flex items-center p-4 border-t">
-          <Avatar className="h-8 w-8 mr-2">
-            <img src="/placeholder.svg?height=32&width=32" alt="Your profile" />
+        <div className="flex items-center gap-2 p-4 border-t">
+          <Avatar className="h-8 w-8 rounded-lg">
+            <AvatarImage
+              src={
+                session?.user?.image
+                  ? session?.user?.image
+                  : "/avatars/shadcn.jpg"
+              }
+              alt={session?.user?.name ? session?.user?.name : "CN"}
+            />
+            <AvatarFallback className="rounded-lg">CN</AvatarFallback>
           </Avatar>
           <Input
             ref={commentInputRef}
