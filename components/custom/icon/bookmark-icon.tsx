@@ -28,7 +28,7 @@ export default function BookmarkIcon({
     <Button
       variant="ghost"
       size="icon"
-      className="ml-auto focus:outline-none"
+      className="inline-flex items-center justify-center rounded-md px-1 font-medium  shadow-neutral-500/20 transition active:scale-95 ml-auto focus:outline-none"
       onClick={handleClick}
       aria-label={active ? "Remove bookmark" : "Add bookmark"}
     >

@@ -21,3 +21,14 @@ export type imagesTpye = {
   createdAt?: Date;
   updatedAt?: Date;
 };
+export type songType = {
+  id: string;
+  title: string;
+  url: string;
+  artist: string;
+  album: string;
+  genre: string;
+  releaseDate: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+};

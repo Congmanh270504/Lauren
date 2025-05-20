@@ -3,7 +3,7 @@
 const config = {
   plugins: {
     '@tailwindcss/postcss': {}, // Use the correct package
-    // autoprefixer: {},          // Keep autoprefixer
+    autoprefixer: {},          // Keep autoprefixer
   },
 };
 

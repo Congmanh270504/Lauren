@@ -8,7 +8,7 @@ import { Heart, MessageCircle, Send, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
 import BookmarkIcon from "@/components/custom/icon/bookmark-icon";
-
+import { MdOutlineInsertEmoticon } from "react-icons/md";
 type Comment = {
   id: string;
   username: string;
@@ -24,7 +24,7 @@ const initialComments: Comment[] = [
   {
     id: "1",
     username: "traghippp",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
+    avatarUrl: "/user.png",
     content: "trời ơi nó đẹp. mà nó đáng yêu. mà nó cơ bắp 😂",
     likes: 291,
     timeAgo: "1d",
@@ -33,7 +33,7 @@ const initialComments: Comment[] = [
   {
     id: "2",
     username: "rare1.official",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
+    avatarUrl: "/user.png",
     content: "Love from INDIA ɴɪɴɪɴɪɴɪɴɪɴɪɴɴ keep up the hard work MTP",
     likes: 278,
     timeAgo: "1d",
@@ -41,7 +41,7 @@ const initialComments: Comment[] = [
       {
         id: "2-1",
         username: "kartik1999_humor",
-        avatarUrl: "/placeholder.svg?height=40&width=40",
+        avatarUrl: "/user.png",
         content:
           "@rare1.official Look how much support you are getting from India😊 #gladtohelp",
         likes: 5,
@@ -52,7 +52,7 @@ const initialComments: Comment[] = [
   {
     id: "3",
     username: "lareine.art",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
+    avatarUrl: "/user.png",
     content: "❤️ ❤️",
     likes: 3,
     timeAgo: "1d",
@@ -61,7 +61,7 @@ const initialComments: Comment[] = [
   {
     id: "4",
     username: "lareine.art",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
+    avatarUrl: "/user.png",
     content: "❤️ ❤️",
     likes: 3,
     timeAgo: "1d",
@@ -70,7 +70,7 @@ const initialComments: Comment[] = [
   {
     id: "5",
     username: "lareine.art",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
+    avatarUrl: "/user.png",
     content: "❤️ ❤️",
     likes: 3,
     timeAgo: "1d",
@@ -79,7 +79,7 @@ const initialComments: Comment[] = [
   {
     id: "6",
     username: "lareine.art",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
+    avatarUrl: "/user.png",
     content:
       " fhkjadsfhjkadslkfasdkjhfklasdkflasdkfjaldks fhjkasdfhaskjdhflaasdkjhflasdkf fhkjadsfhjkadslkfasdkjhfklasdkflasdkfjaldksfhjkasdfhaskjdhflaasdkjhflasdkf",
     likes: 3,
@@ -89,7 +89,7 @@ const initialComments: Comment[] = [
   {
     id: "7",
     username: "lareine.art",
-    avatarUrl: "/placeholder.svg?height=40&width=40",
+    avatarUrl: "/user.png",
     content: "❤️ ❤️",
     likes: 3,
     timeAgo: "1d",
@@ -129,7 +129,7 @@ export function CommentSection() {
       const comment: Comment = {
         id: `new-${Date.now()}`,
         username: "user",
-        avatarUrl: "/placeholder.svg?height=40&width=40",
+        avatarUrl: "/user.png",
         content: newComment,
         likes: 0,
         timeAgo: "Just now",
@@ -144,9 +144,9 @@ export function CommentSection() {
   return (
     <div className="flex flex-col gap-2 w-full h-full">
       {/* Post header */}
-      <div className="flex items-center p-4 border-b">
+      <div className="flex items-center p-4 border-b ">
         <Avatar className="h-8 w-8 mr-2">
-          <img src="/placeholder.svg?height=32&width=32" alt="Profile" />
+          <img src="/user.png" alt="Profile" />
         </Avatar>
         <div className="flex items-center gap-1">
           <span className="font-semibold">sontungmtp</span>
@@ -179,7 +179,7 @@ export function CommentSection() {
         {comments.map((comment) => (
           <div key={comment.id} className="mb-4">
             <div className="flex">
-              <Avatar className="h-8 w-8 flex-shrink-0">
+              <Avatar className="h-8 w-8 flex-shrink-0 mr-1">
                 <img
                   src={comment.avatarUrl || "/placeholder.svg"}
                   alt={comment.username}
@@ -217,7 +217,7 @@ export function CommentSection() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 flex-shrink-0"
+                className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95"
               >
                 <Heart className="h-4 w-4" />
               </Button>
@@ -276,7 +276,7 @@ export function CommentSection() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-8 w-8 flex-shrink-0"
+                      className="h-8 w-8 flex-shrink-0 inline-flex items-center justify-center rounded-md  font-medium  shadow-neutral-500/20 transition active:scale-95 "
                     >
                       <Heart className="h-4 w-4" />
                     </Button>
@@ -292,16 +292,32 @@ export function CommentSection() {
       <div className=" bg-white shadow-lg mt-auto">
         <div className="p-4 border-t">
           <div className="flex items-center mb-3">
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              className=" hover:bg-transparent"
+            >
               <Heart className="h-6 w-6" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={focusCommentInput}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className=" hover:bg-transparent"
+              onClick={focusCommentInput}
+            >
               <MessageCircle className="h-6 w-6" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleAddComment}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className=" hover:bg-transparent"
+              onClick={handleAddComment}
+            >
               <Send className="h-6 w-6" />
             </Button>
-            <BookmarkIcon size={24} />
+            <BookmarkIcon
+              size={24}
+            />
           </div>
           <div className="text-sm font-semibold mb-1">
             Liked by <span className="font-semibold">_ttruc.niiiii_</span> and{" "}
@@ -335,6 +351,13 @@ export function CommentSection() {
               }
             }}
           />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-4 flex-shrink-0 inline-flex items-center justify-center rounded-md px-1 font-medium  shadow-neutral-500/20 transition active:scale-95 hover:bg-transparent"
+          >
+            <MdOutlineInsertEmoticon className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"
