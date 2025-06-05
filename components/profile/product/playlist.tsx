@@ -79,7 +79,7 @@ export default function PlayList() {
   };
 
   return (
-    <div className=" rounded-lg text-black shadow-xl">
+    <div className=" rounded-lg text-black shadow-xl ">
       <div className="flex items-center justify-between p-4 pb-2">
         <h2 className="text-lg font-bold">My Favorites</h2>
         <a

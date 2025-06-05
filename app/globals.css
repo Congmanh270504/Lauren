@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Playwrite+IS:wght@100..400&display=swap");
 @import 'tailwindcss';
+@import "tailwindcss-animated";
 @plugin "daisyui";
 @plugin "tailwindcss-motion";
 @custom-variant dark (&:is(.dark *));
@@ -177,4 +178,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  background: #A7C1A8;
+}
+
+::selection {
+  background: #254D70;
 }

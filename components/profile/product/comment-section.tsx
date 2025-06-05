@@ -43,7 +43,16 @@ const initialComments: Comment[] = [
         username: "kartik1999_humor",
         avatarUrl: "/user.png",
         content:
-          "@rare1.official Look how much support you are getting from India😊 #gladtohelp",
+          "Look how much support you are getting from India😊 #gladtohelp",
+        likes: 5,
+        timeAgo: "1d",
+      },
+      {
+        id: "2-2",
+        username: "kartik1999_humor",
+        avatarUrl: "/user.png",
+        content:
+          "Look how much support you are getting from India😊 #gladtohelp",
         likes: 5,
         timeAgo: "1d",
       },
@@ -140,6 +149,35 @@ export function CommentSection() {
       setNewComment("");
     }
   };
+  const handleReply = (commentId: string) => {
+    setNewComment(
+      "@" + comments.find((c) => c.id === commentId)?.username + " "
+    );
+    // tạo 1 biến aa lưu người dùng mình muốn reply
+    // => thay đổi cái hàm handleAddComment nếu biến aa != null thì reply cho user đó
+    // kết thúc reset lại biến aa === null
+
+    // const comment = comments.find((c) => c.id === commentId);
+    // if (comment) {
+    //   const reply: Comment = {
+    //     id: `reply-${Date.now()}`,
+    //     username: "user",
+    //     avatarUrl: "/user.png",
+    //     content: newComment,
+    //     likes: 0,
+    //     timeAgo: "Just now",
+    //   };
+
+    //   setComments((prev) =>
+    //     prev.map((c) =>
+    //       c.id === commentId
+    //         ? { ...c, replies: [...(c.replies || []), reply] }
+    //         : c
+    //     )
+    //   );
+    //   setNewComment("");
+    // }
+  };
 
   return (
     <div className="flex flex-col gap-2 w-full h-full">
@@ -175,7 +213,7 @@ export function CommentSection() {
       </div>
 
       {/* Comments section */}
-      <div className="h-10 grow overflow-y-auto p-2 ">
+      <div className="h-10 grow overflow-y-auto p-2 no-scrollbar">
         {comments.map((comment) => (
           <div key={comment.id} className="mb-4">
             <div className="flex">
@@ -201,6 +239,7 @@ export function CommentSection() {
                       variant="ghost"
                       size="sm"
                       className="h-auto py-0 px-2"
+                      onClick={() => handleReply(comment.id)}
                     >
                       Reply
                     </Button>
@@ -257,7 +296,10 @@ export function CommentSection() {
                           <span className="font-semibold">
                             {reply.username}
                           </span>{" "}
-                          <span className="p-2">{reply.content}</span>
+                          <span className="text-blue-500 cursor-pointer hover:underline">
+                            @{comment.username}
+                          </span>{" "}
+                          <span>{reply.content}</span>
                         </div>
                         <div className="flex items-center mt-1 text-xs text-gray-500">
                           <span>{reply.timeAgo}</span>
@@ -315,9 +357,7 @@ export function CommentSection() {
             >
               <Send className="h-6 w-6" />
             </Button>
-            <BookmarkIcon
-              size={24}
-            />
+            <BookmarkIcon size={24} />
           </div>
           <div className="text-sm font-semibold mb-1">
             Liked by <span className="font-semibold">_ttruc.niiiii_</span> and{" "}
@@ -366,7 +406,11 @@ export function CommentSection() {
               !newComment.trim() && "opacity-50 cursor-not-allowed"
             )}
             disabled={!newComment.trim()}
-            onClick={handleAddComment}
+            onClick={() => {
+              if (newComment.startsWith("@")) {
+                console.log(newComment);
+              } else handleAddComment();
+            }}
           >
             Post
           </Button>

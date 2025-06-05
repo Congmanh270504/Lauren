@@ -1,6 +1,7 @@
 import { NextAuthOptions, Session } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import FacebookProvider from "next-auth/providers/facebook";
+import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/utils/prisma";
 import clientPromise from "./mongodbClient";
@@ -25,6 +26,10 @@ export const authOptions: NextAuthOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_ID as string,
@@ -64,7 +69,9 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account, profile }) {
       if (
         account &&
-        (account.provider === "github" || account.provider === "facebook")
+        (account.provider === "github" ||
+          account.provider === "facebook" ||
+          account.provider === "google")
       ) {
         const client = await clientPromise;
         const db = client.db();
@@ -93,12 +100,18 @@ export const authOptions: NextAuthOptions = {
       // Attach user ID or other data to the session
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+        session.user.image = token.picture as string;
       }
       return session;
     },
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id || new ObjectId().toString();
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+        token.picture = user.image;
       }
       return token;
     },

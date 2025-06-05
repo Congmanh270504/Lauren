@@ -26,6 +26,9 @@ import { FaFacebook } from "react-icons/fa6";
 import { TypographyH4 } from "@/components/ui/typography";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Facebook from "@/components/icons/facebook";
+import Google from "@/components/icons/google";
+import GitHub from "@/components/icons/github";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -100,7 +103,18 @@ export default function LoginForm({
               });
             }}
           >
-            <FaFacebook /> Login with Facebook
+            <Facebook /> Login with Facebook
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full h-12 text-base font-medium border-2"
+            onClick={() => {
+              signIn("google", {
+                callbackUrl: "/",
+              });
+            }}
+          >
+            <Google /> Login with Google
           </Button>
           <Button
             variant="outline"
@@ -111,7 +125,7 @@ export default function LoginForm({
               });
             }}
           >
-            <FaGithub /> Login with Github
+            <GitHub /> Login with Github
           </Button>
           <div className="relative text-center text-base my-2 after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
             <span className="relative z-10 bg-background px-4 text-muted-foreground">
