@@ -68,7 +68,9 @@ const ClientProvider: React.FC<ClientProviderProps> = ({ children }) => {
               </Breadcrumb>
             </div>
           </header>
-          {children}
+          <div className="w-full h-[calc(100vh-var(--spacing)*16)] overflow-hidden">
+            {children}
+          </div>
         </SidebarInset>
       </SidebarProvider>
       <Toaster richColors closeButton position="bottom-right" />

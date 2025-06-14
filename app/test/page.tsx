@@ -1,12 +1,15 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import * as React from "react";
+
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import AudioUpload from "@/components/custom/audio-upload";
 
 export default function Home() {
-  return (
-    <span>
-      <Button className="animate-fade-down animate-once animate-duration-1000 animate-ease-linear animate-normal">
-        aaa
-      </Button>
-    </span>
-  );
+  return <div>a</div>;
 }

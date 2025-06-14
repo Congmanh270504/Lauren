@@ -6,10 +6,12 @@ module.exports = {
     ],
     theme: {
         extend: {
-            // your custom theme here
+            screens: {
+                '4k': '2500px', // breakpoint cho màn hình lớn hơn 24 inch
+            },
         },
     },
     plugins: [
         require('tailwindcss-motion'),
     ],
-  };
+};
