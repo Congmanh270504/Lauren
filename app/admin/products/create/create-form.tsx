@@ -218,7 +218,6 @@ const CreateForm = ({ categories }: { categories: categoryType[] }) => {
               className="rounded-lg cursor-pointer"
               size="sm"
               type="submit"
-              variant="submit"
               disabled={isPending || isLoadingFile} // Disable if form is invalid or pending
             >
               {isPending ? (

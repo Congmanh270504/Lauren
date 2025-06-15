@@ -146,7 +146,7 @@ export default function Iridescence({
   }, [color, speed, amplitude, mouseReact]);
 
   return (
-    <div ref={ctnDom} className="w-full h-full " {...rest}>
+    <div ref={ctnDom} className="w-full h-full" {...rest}>
       <div className="absolute top-20 inset-0 h-fit 2xl:top-28">
         <AudioUpload />
       </div>

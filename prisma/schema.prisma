@@ -35,6 +35,8 @@ model Songs {
   Artists Artists @relation(fields: [artistId], references: [id])
   Playlists Playlists @relation(fields: [playlistId], references: [id])
   Wishlist Wishlist[]
+  imageId String @unique @db.ObjectId @default("")
+  image Images @relation(fields: [imageId], references: [id])
 }
 
 model Artists {
@@ -60,6 +62,8 @@ model Images {
   Users      Users?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  songId    String   @db.ObjectId
+  Songs     Songs?
 }
 
 model Users {
