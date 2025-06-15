@@ -133,20 +133,6 @@ export default function AudioUpload() {
           </div>
         )}
       </div>
-      {/* split 2 component in here */}
-      {/* <div className="mt-8 p-6 bg-gray-800 rounded-lg">
-        {artist && (
-          <p>
-            <b>Tác giả:</b> {artist}
-          </p>
-        )}
-        {uploadedFiles.map((file, index) => (
-          <p key={index}>
-            <b>Tên file:</b> {file.name.replace(/\.[^/.]+$/, "")}
-          </p>
-        ))}
-        <p>{error && <p style={{ color: "red" }}>{error}</p>}</p>
-      </div> */}
     </div>
   );
 }

@@ -22,6 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import UploadImageSong from "./upload-image-song";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface SongDetailsProps {
   uploadedFiles: File[];
@@ -37,7 +39,7 @@ export default function SongDetails({
       .string()
       .min(1, { message: "This field is required" })
       .min(1, { message: "Must be at least 1 characters" })
-      .max(30, { message: "Must be at most 30 characters" }),
+      .max(60, { message: "Must be at most 60 characters" }),
     artistName: z
       .string()
       .min(1, { message: "This field is required" })
@@ -51,21 +53,53 @@ export default function SongDetails({
       }),
     genre: z.string(),
     album: z.string(),
+    songsImages: z.instanceof(File),
   });
-
+  const [isPending, setIsPending] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: uploadedFiles[0].name.replace(/\.[^/.]+$/, ''),
+      title: uploadedFiles[0].name.replace(/\.[^/.]+$/, ""),
       artistName: artist,
       trackLink: "http://localhost:3000/songs/",
       genre: "",
       album: "",
+      songsImages: undefined,
     },
   });
+  const handleFileUpload = async (file: File) => {
+    try {
+      const data = new FormData();
+      data.set("songs", file);
+      data.set("images", form.getValues("songsImages"));
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+      const uploadFile = await fetch("/api/uploadFiles", {
+        method: "POST",
+        body: data,
+      });
+      const response = await uploadFile.json();
+      return response;
+    } catch (error) {
+      toast.error("Error uploading file");
+    }
+  };
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsPending(true);
+      const cid = await handleFileUpload(uploadedFiles[0]);
+      if (cid.status !== 200) {
+        toast.success("Song uploaded successfully");
+      } else {
+        toast.error("Failed to upload song");
+      }
+      console.log(values, cid);
+      setIsPending(false);
+    } catch (error) {
+      setIsPending(false);
+      toast.error("Failed to upload song");
+    }
+
+    // console.log(values);
   }
 
   function onReset() {
@@ -81,8 +115,27 @@ export default function SongDetails({
         className="space-y-8 @container"
       >
         <div className="grid grid-cols-2 w-full gap-4 max-sm:grid-cols-1">
-          {/* flex items-center justify-center */}
-          <UploadImageSong />
+          <FormField
+            control={form.control}
+            name="songsImages"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  {/* <UploadFile
+                    field={field} // Pass the field object to the UploadFile component
+                    randomColor={randomColor}
+                    isLoadingFile={isLoadingFile}
+                    setIsLoadingFile={setIsLoadingFile}
+                    setFiles={setFiles}
+                    files={files}
+                  /> */}
+                  <UploadImageSong field={field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="grid grid-cols-12 gap-4 text-black">
             <div
               key="text-0"

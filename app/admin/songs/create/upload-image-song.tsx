@@ -4,16 +4,17 @@ import { ImageIcon, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { Button } from "@/components/ui/button";
 
-const UploadImageSong = () => {
+const UploadImageSong = (field: { field: any }) => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string>("");
+  const [fileName, setFileName] = useState<File[]>([]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setUploadedImage(imageUrl);
-      setFileName(file.name);
+      setFileName([file]);
+      field.field.onChange(file); // Call the onChange method from the field object
     }
   }, []);
 
@@ -30,7 +31,7 @@ const UploadImageSong = () => {
       URL.revokeObjectURL(uploadedImage);
     }
     setUploadedImage(null);
-    setFileName("");
+    setFileName([]);
   };
   return (
     <div className="w-full h-full">
@@ -61,10 +62,12 @@ const UploadImageSong = () => {
             </Button>
             <img
               src={uploadedImage || "/placeholder.svg"}
-              alt={fileName}
+              alt={fileName[0]?.name || "Uploaded image"}
               className="w-full h-auto max-h-96 object-contain rounded-md"
             />
-            <p className="text-white text-sm mt-2 truncate">{fileName}</p>
+            <p className="text-black text-sm mt-2 truncate">
+              {fileName[0]?.name}
+            </p>
           </div>
         ) : (
           <div className="py-12">
